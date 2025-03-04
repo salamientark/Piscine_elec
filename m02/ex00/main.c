@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 16:31:16 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/04 22:58:14 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/04 23:46:03 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,16 +58,16 @@ static void uart_init(void) {
 /**
 * @brief Transmit 'Z' character to UART
 */
-static void uart_tx(void) {
+static void uart_tx(char c) {
 	while (!(UCSR0A & (1 << UDRE0))) {} /* Check if the transmit buffer is empty */
 
-	UDR0 = 'Z'; /* Write the character to the USART data register */
+	UDR0 = c; /* Write the character to the USART data register */
 }
 
 int main() {
 	uart_init();
 	while (1) {
-		uart_tx();
+		uart_tx('Z');
 		_delay_ms(1000);
 	}
 	return (0);
