@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 16:31:16 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/03 18:53:20 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/04 14:00:08 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,6 @@ int main() {
 							  * 0 ^ 1 = 1 only. 0 ^ 0 = 0, 1 ^ 1 = 0
 							  * So it will revert only the right bit
 							  */
-		wait(80000);
+		wait(150000);
 	}
 }

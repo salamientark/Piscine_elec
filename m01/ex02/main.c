@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 16:31:16 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/04 10:54:16 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/04 12:39:35 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,15 +30,21 @@
  */
 static void init(void) {
 	DDRB |= (1 << PB1); /* Set PB1 (LED1) pin as output */
-	TCCR1A = 0B01000000; /* Toggle OC1A on compare match 
-						  * and set Waveform Generation to CTC
-						  * Make the led 1 blink
+	// TCCR1A = 0B10000011;
+	TCCR1A = 0B10000010; /* Clear OC1A on compare match
+						  * Set OC1A at bottom
+						  * Set mode to fast PWM
+						  * Make the led blink
 						  */
-	TCCR1B = 0B00001101; /* Set Wave Generation Mode to CTC
+	TCCR1B = 0B00011101; /* Set Wave Generation Mode to FastPWM
 						 * Set prescaler to 1024
 						 */
-	OCR1AH = 0x1E; /* Set the high byte of the output compare register */
-	OCR1AL = 0x84; /* Set the low byte of the output compare register */
+	OCR1AH = 0x06; /* Set the high byte of the output compare register */
+	OCR1AL = 0x1A; /* Set the low byte of the output compare register */
+
+	// Define counter TOP value
+	ICR1H = 0x3D; /// Set the high byte of the input capture register
+	ICR1L = 0x08; /// Set the low byte of the input capture register
 }
 
 
