@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 16:31:16 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/04 20:21:42 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/04 22:58:14 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 
  *All the information that I needed for this can be found at:
  *  - https://ww1.microchip.com/downloads/en/DeviceDoc/ATmega48A-PA-88A-PA-168A-PA-328-P-DS-DS40002061A.pdf/
+ *  USART seeting are described at pages 179-204
  */
 
 /**
@@ -38,26 +39,32 @@
 */
 static void uart_init(void) {
 	/* Set baud rate */
-	UBRR0 = 8;
+	UBRR0 = F_CPU / (16 * (UART_BAUDRATE + 1)); /* Set Baud rate in the
+												 * USART Baud Rate registers
+												 */
 
 	/* Set frame format: 8data bits, No parity, 1stop bit */
-	UCSR0C = 0B00000110;
+	UCSR0C = 0B00000110; /* Set mode to:
+						  * Asynchronous USART
+						  * No Parity
+						  * 1 Stop bit
+						  * 8-bit word size
+						  */
 
 	/* Enable transmitter + 8data bits */
-	UCSR0B |= (1 << TXEN0);
+	UCSR0B |= (1 << TXEN0); /* Enable transmitter */
 }
 
 /**
 * @brief Transmit 'Z' character to UART
 */
 static void uart_tx(void) {
-	while (!(UCSR0A & (1 << UDRE0))) {}
+	while (!(UCSR0A & (1 << UDRE0))) {} /* Check if the transmit buffer is empty */
 
-	UDR0 = 'Z';
+	UDR0 = 'Z'; /* Write the character to the USART data register */
 }
 
 int main() {
-	// init();
 	uart_init();
 	while (1) {
 		uart_tx();
