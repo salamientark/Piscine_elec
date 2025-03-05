@@ -58,7 +58,7 @@ static void uart_init(void) {
 						  * 8-bit word size
 						  */
 	/* Enable transmitter + 8data bits */
-	UCSR0B |= (1 << RXCIE0) | (1 << RXEN0) | (1 << TXEN0); /* Enable transmitter */
+	UCSR0B |= (1 << RXEN0) | (1 << TXEN0); /* Enable transmitter */
 }
 
 
@@ -102,10 +102,10 @@ static char uart_rx(void) {
 /*                                 INTERUPTS                                  */
 /* ************************************************************************** */
 
-ISR(USART_RX_vect) {
-	/* This function is called when the TIMER0_COMPARE_A interrupts occurs */
-	uart_tx(uart_rx());
-}
+// ISR(USART_RX_vect) {
+// 	/* This function is called when the TIMER0_COMPARE_A interrupts occurs */
+// 	uart_tx(uart_rx());
+// }
 
 
 /* ************************************************************************** */
@@ -114,9 +114,9 @@ ISR(USART_RX_vect) {
 int main() {
 	init();
 	uart_init();
-	sei(); /* Enable global interrupts
-			* Same as SREG |= (1 << 7);
-			*/
-	while (1) {}
+
+	while (1) {
+		uart_tx(uart_rx());
+	}
 	return (0);
 }
