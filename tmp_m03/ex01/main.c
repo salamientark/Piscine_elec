@@ -12,15 +12,20 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
+#include <util/delay_basic.h>
 
-/**
+/* Define RGB LED COLOR CODE */
+#define RGB_LED_RED		0b00100000
+#define RGB_LED_GREEN	0b01000000
+#define RGB_LED_BLUE	0b00001000
 
- *All the information that I needed for this can be found at:
- *  - https://ww1.microchip.com/downloads/en/DeviceDoc/ATmega48A-PA-88A-PA-168A-PA-328-P-DS-DS40002061A.pdf/
- *  CORE SREG register description page 20
-*  INTERRUPTS description at pages 74
- *  TIMER0 settings at pages 102-119
- *  USART seeting are described at pages 179-204
+#define RGB_LED_YELLOW	0b01100000
+#define RGB_LED_CYAN	0b01001000
+#define RGB_LED_MAGENTA	0b00101000
+#define RGB_LED_WHITE	0b01101000
+
+/** *All the information that I needed for this can be found at:
+ *  - https://ww1.microchip.com/downloads/en/DeviceDoc/ATmega48A-PA-88A-PA-168A-PA-328-P-DS-DS40002061A.pdf
  */
 
 /* ************************************************************************** */
@@ -34,78 +39,40 @@ static void init(void) {
 	/* TIMER10 Setup */
 	TCCR1A = 0b00000000; /* Set CTC mode */
 	TCCR1B = 0b00001101; /* Set prescaler to 1024 */
-	OCR1A = (uint16_t)2 * F_CPU / 1024 - 1; /* Set compare value */
+	OCR1A = (uint16_t) (F_CPU / 1024 - 1); /* Set compare value */
 	TIMSK1 = 0b00000010; /* Enable interrupt when comapre with OCCR0A occur */
-}
-
-/**
-* @brief Initialize UART settings
-*
-* 1. Set baud rate
-* 2. Set frame format
-* 3. Enable transmitter
-*/
-static void uart_init(void) {
-	/* Set baud rate */
-	UBRR0 = F_CPU / (16 * (UART_BAUDRATE + 1)); /* Set Baud rate in the
-												 * USART Baud Rate registers
-												 */
-	/* Set frame format: 8data bits, No parity, 1stop bit */
-	UCSR0C = 0B00000110; /* Set mode to:
-						  * Asynchronous USART
-						  * No Parity
-						  * 1 Stop bit
-						  * 8-bit word size
-						  */
-	/* Enable transmitter + 8data bits */
-	UCSR0B |= (1 << TXEN0); /* Enable transmitter */
-}
-
-
-/* ************************************************************************** */
-/*                                   UART                                     */
-/* ************************************************************************** */
-
-/**
- * @brief Transmit 'Z' character to UART
- */
-static void uart_tx(char c) {
-	while (!(UCSR0A & (1 << UDRE0))) {} /* Check if the transmit buffer is empty */
-	UDR0 = c; /* Write the character to the USART data register */
-}
-
-/**
- * @brief Send string to UART transmitter
- *
- * @param str - string to send
- */
-static void uart_printstr(const char* str) {
-	while (*str) {
-		uart_tx(*str);
-		str++;
-	}
+	
+	/* RGB LED INIT */
+	DDRD = 0b01101000; /// Set RGB LED as outputs in the DATA_DIRECTION_REGISTER
+	PORTD |= (1 << PD5); /* Set RED LED to RED */
 }
 
 /* ************************************************************************** */
 /*                                 INTERUPTS                                  */
 /* ************************************************************************** */
 
-ISR(TIMER1_COMPA_vect) {
-	/* This function is called when the TIMER0_COMPARE_A interrupts occurs */
-	uart_printstr("Hello World!\n\r");
-}
-
-
 /* ************************************************************************** */
 /*                                    MAIN                                    */
 /* ************************************************************************** */
+
 int main() {
 	init();
-	uart_init();
-	/* Set CORE registers */
-	sei(); /* Enable global interrupts
-			* Same as SREG |= (1 << 7);
-			*/
-	while (1) {}
+
+	while (1) {
+		PORTD = RGB_LED_RED; /* LED RED */
+		_delay_ms(1000);
+		PORTD = RGB_LED_GREEN; /* LED GREEN */
+		_delay_ms(1000);
+		PORTD = RGB_LED_BLUE; /* LED BLUE */
+		_delay_ms(1000);
+		PORTD = RGB_LED_YELLOW; /* LED YELLOW */
+		_delay_ms(1000);
+		PORTD = RGB_LED_CYAN; /* LED CYAN */
+		_delay_ms(1000);
+		PORTD = RGB_LED_MAGENTA; /* LED MAGENTA */
+		_delay_ms(1000);
+		PORTD = RGB_LED_WHITE; /* LED WHITE */
+		_delay_ms(1000);
+	}
 	return (0);
 }
