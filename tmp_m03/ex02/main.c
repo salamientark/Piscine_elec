@@ -12,17 +12,6 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
-#include <util/delay_basic.h>
-
-/* Define RGB LED COLOR CODE */
-#define RGB_LED_RED		0b00100000
-#define RGB_LED_GREEN	0b01000000
-#define RGB_LED_BLUE	0b00001000
-
-#define RGB_LED_YELLOW	0b01100000
-#define RGB_LED_CYAN	0b01001000
-#define RGB_LED_MAGENTA	0b00101000
-#define RGB_LED_WHITE	0b01101000
 
 /** *All the information that I needed for this can be found at:
  *  - https://ww1.microchip.com/downloads/en/DeviceDoc/ATmega48A-PA-88A-PA-168A-PA-328-P-DS-DS40002061A.pdf
@@ -48,15 +37,14 @@ void init_rgb() {
 	TCCR0A = 0b10100011; /* OC0A and OC0B in Inverting mode
 						  * and set Mode To Fast PWM with TOP = 0xFF
 						  */
-	TCCR0B = 0b00000000; /* Set prescaler to 1024 */
-	// OCR0A = 255; /* Set compare value */
-	// TIMSK1 = 0b00000010; /* Enable interrupt when comapre with OCCR0A occur */
+	TCCR0B = 0b00000001; /* Set no prescaler */
 
 	/* TIMER2 Setup TO Hz */
 	TCCR2A = 0b00100011; /* OC2A in Inverting mode
 						  * and set Mode To Fast PWM with TOP = 0xFF
 						  */
-	TCCR2B = 0b00000000; /* Set prescaler to 1024 */
+	TCCR2B = 0b00000001; /* Set prescaler no prescaler */
+
 }
 
 void set_rgb(uint8_t r, uint8_t g, uint8_t b) {
@@ -86,9 +74,10 @@ int main() {
 	init_rgb();
 
 	while (1) {
-		for (uint8_t i = 0; i < 255; i++)
+		for (volatile uint8_t i = 0; i < 255; i++) {
 			wheel(i);
-		// wheel(TCNT0);
+			_delay_ms(10);
+		}
 	}
 	return (0);
 }
