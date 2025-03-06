@@ -17,8 +17,8 @@
 
 volatile uint8_t b1_debounce = 0;
 volatile uint8_t b1_press_dir = 0;
-volatile uint8_t b2_debounce = 0;
-volatile uint8_t b2_press_dir = 0;
+// volatile uint8_t b2_debounce = 0;
+volatile uint8_t b2_last_state = 1;
 volatile uint8_t nbr = 0;
 
 /** *All the information that I needed for this can be found at:
@@ -64,7 +64,7 @@ static void init(void) {
 							* When button is pressed generate interrupts*/
 	EIMSK |= (1  << INT0); /* Activate interrupt on INT0 */
 
-	PCICR |= (1 << PCIE2) | (1 << PCIE0); /* Activate interrupt on PCINT0:7 and PCINT16:23 */
+	PCICR |= (1 << PCIE2); /* Activate interrupt on PCINT0:7 and PCINT16:23 */
 	PCMSK2 |= (1 << PCINT20); /* Activate interrupt on PCINT18 */
 }
 
@@ -124,13 +124,13 @@ ISR(TIMER0_COMPA_vect) {
     static volatile uint8_t count = 0;
     count++;
     if (count >= DEBOUNCE_TIME) {
-		nbr = (nbr + 1) % 16;
 
         b1_debounce = 0;
         count = 0;
         TIMSK0 &= ~(1 << OCIE0A); /* Disable interrupt */
 		if (!b1_press_dir)
-			nbr++;
+			nbr = (nbr + 1) % 16;
+			// nbr++;
 		printNbr(nbr);
 		EICRA ^= (1 << ISC00); /* Toggle interrupt edge */
     }
@@ -138,13 +138,18 @@ ISR(TIMER0_COMPA_vect) {
 
 /* Press button 2 */
 ISR(PCINT2_vect) {
-	if (!b2_debounce) {
-		b2_debounce = 1;
-		TCNT2 = 0; /* Reset Timer0 */
-		TIMSK2 |= (1 << OCIE0A); /* Set interrupt flag */
-
-		b2_press_dir = (PCIFR & (1 << PCIF2)); /* Get current press dir (pressing / releasing) */
+	PCICR &= ~(1 << PCIE2); /* Disable interrupt */
+	_delay_ms(150);
+	PCICR |= (1 << PCIE2); /* Disable interrupt */
+	if (b2_last_state) {
+		if (nbr == 0)
+			nbr = 16;
+		nbr--;
+		b2_last_state = 0;
+		printNbr(nbr);
+		return ;
 	}
+	b2_last_state = 1;
 }
 
 /* Debounce button 2 */
@@ -152,17 +157,13 @@ ISR(TIMER2_COMPA_vect) {
     static volatile uint8_t count = 0;
     count++;
     if (count >= DEBOUNCE_TIME) {
-		if (nbr == 0)
-			nbr = 16;
-		else 
-			nbr--;
 		printNbr(nbr);
         b1_debounce = 0;
         count = 0;
         TIMSK2 &= ~(1 << OCIE2A); /* Disable interrupt */
 		// if (!b1_press_dir)
 		// 	PORTB ^= (1 << PB0); /* Toggle LED */
-		// EICRA ^= (1 << ISC00); /* Toggle interrupt edge */
+		EICRA ^= (1 << ISC00); /* Toggle interrupt edge */
     }
 }
 
