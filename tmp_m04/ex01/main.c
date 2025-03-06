@@ -13,8 +13,16 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 
+#define DEBOUNCE_TIME 3
+
+volatile uint8_t count_dir = 0;
+
 /** *All the information that I needed for this can be found at:
  *  - https://ww1.microchip.com/downloads/en/DeviceDoc/ATmega48A-PA-88A-PA-168A-PA-328-P-DS-DS40002061A.pdf
+ *    - Schem at Page 12
+ *    - TIMER0 at Page 102-120
+ *    - Interrupts at page 66 - 78
+ *    - External Interrupts at Pages 79 - 84
  */
 
 /* ************************************************************************** */
@@ -25,44 +33,45 @@
  * @brief Initialize DATA_DIRECTION registers
  */
 static void init(void) {
-	/* RGB LED INIT */
-	DDRD = 0b01101000; /// Set RGB LED as outputs in the DATA_DIRECTION_REGISTER
+	/* LED INIT */
+	DDRB |= (1 << DDB1); /* Set PB0 as output */
+
+	/* TIMER0 INIT */
+	TCCR0A |= (1 << WGM01) | (1 << WGM00); /* PWM Phase correct */
+	TCCR0B |= (1 << CS00); /* No prescaler */
+	OCR0A = 2; /* Duty cycle value 50% of 0xFF */
+	TIMSK0 |= (1 << OCIE0A); /* Enable interrupt */
+
+	/* TIMER1 INIT */
+	TCCR1A |= (1 << COM1A1) | (1 << WGM11); /* Mode Fast PWM, TOP ICR1
+											 * Clear OC1A on compare match, set OC1A at BOTTOM */
+	TCCR1B |= (1 << WGM13) | (1 << WGM12) | (1 << CS10); /* Mode Fast PWM, TOP ICR1
+														  * No prescaler */
+	ICR1 = 0xFFFF; /* Max TOP value for timer1 */
+	OCR1A = 0xFF; /* Duty cycle value 0% of 0xFF */
+
+	/* INTERRUPS INIT */
+	// EICRA |= (1 << ISC01); /* Falling edge of INT0 generate interrupts
+	// 						* When button is pressed generate interrupts*/
+	// EIMSK |= (1 << INT0); /* Activate interrupt on INT0 */
+	//
+	/* TESTING */
+	DDRB |= (1 << DDB1);
 }
 
-/* ************************************************************************** */
-/*                                  RGB_LED                                   */
-/* ************************************************************************** */
-void init_rgb() {
-	/* TIMER0 Setup TO Hz */
-	TCCR0A = 0b10100011; /* OC0A and OC0B in Inverting mode
-						  * and set Mode To Fast PWM with TOP = 0xFF
-						  */
-	TCCR0B = 0b00000001; /* Set no prescaler */
-
-	/* TIMER2 Setup TO Hz */
-	TCCR2A = 0b00100011; /* OC2A in Inverting mode
-						  * and set Mode To Fast PWM with TOP = 0xFF
-						  */
-	TCCR2B = 0b00000001; /* Set prescaler no prescaler */
-
-}
-
-void set_rgb(uint8_t r, uint8_t g, uint8_t b) {
-	OCR0B = r;
-	OCR0A = g;
-	OCR2B = b;
-}
-
-void wheel(uint8_t pos) {
-	pos = 255 - pos;
-	if (pos < 85) {
-		set_rgb(255 - pos * 3, 0, pos * 3);
-	} else if (pos < 170) {
-		pos = pos - 85;
-		set_rgb(0, pos * 3, 255 - pos * 3);
-	} else { pos = pos - 170;
-		set_rgb(pos * 3, 255 - pos * 3, 0);
+ISR(TIMER0_COMPA_vect) {
+	if (count_dir == 0) {
+		OCR1A++;
+		if (OCR1A == 0xFFFF) {
+			count_dir = 1;
+		}
+	} else {
+		OCR1A--;
+		if (OCR1A == 0x0) {
+			count_dir = 0;
+		}
 	}
+	PORTB ^= (1 << PB1); /* Toggle LED */
 }
 
 /* ************************************************************************** */
@@ -71,13 +80,9 @@ void wheel(uint8_t pos) {
 
 int main() {
 	init();
-	init_rgb();
+	sei(); /* Enable global interrupts */
 
-	while (1) {
-		for (volatile uint8_t i = 0; i < 255; i++) {
-			wheel(i);
-			_delay_ms(10);
-		}
-	}
+	while (1) {}
+
 	return (0);
 }

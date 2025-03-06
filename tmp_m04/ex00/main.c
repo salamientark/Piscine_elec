@@ -13,8 +13,17 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 
+#define DEBOUNCE_TIME 3
+
+volatile uint8_t debounce_flag = 0;
+volatile uint8_t press_dir = 0;
+
 /** *All the information that I needed for this can be found at:
  *  - https://ww1.microchip.com/downloads/en/DeviceDoc/ATmega48A-PA-88A-PA-168A-PA-328-P-DS-DS40002061A.pdf
+ *    - Schem at Page 12
+ *    - TIMER0 at Page 102-120
+ *    - Interrupts at page 66 - 78
+ *    - External Interrupts at Pages 79 - 84
  */
 
 /* ************************************************************************** */
@@ -25,44 +34,43 @@
  * @brief Initialize DATA_DIRECTION registers
  */
 static void init(void) {
-	/* RGB LED INIT */
-	DDRD = 0b01101000; /// Set RGB LED as outputs in the DATA_DIRECTION_REGISTER
+	/* LED INIT */
+	DDRB |= (1 << DDB0); /* Set PB0 as output */
+	PORTB &= ~(1 << PB0); /* Set PB0 to LOW */
+
+	/* TIMER INIT */
+	/* This is an attempt to solve bouncing */
+	TCCR0A |= (1 << WGM01); /* CTC mode */
+	TCCR0B |= (1 << CS02) | (1 << CS00); /* Prescaler 1024 */
+	OCR0A = 255; /* Compare value 33ms | 30Hz*/
+
+	/* INTERRUPS INIT */
+	EICRA |= (1 << ISC01); /* Falling edge of INT0 generate interrupts
+							* When button is pressed generate interrupts*/
+	EIMSK |= (1 << INT0); /* Activate interrupt on INT0 */
 }
 
-/* ************************************************************************** */
-/*                                  RGB_LED                                   */
-/* ************************************************************************** */
-void init_rgb() {
-	/* TIMER0 Setup TO Hz */
-	TCCR0A = 0b10100011; /* OC0A and OC0B in Inverting mode
-						  * and set Mode To Fast PWM with TOP = 0xFF
-						  */
-	TCCR0B = 0b00000001; /* Set no prescaler */
+ISR(INT0_vect) {
+	if (!debounce_flag) {
+		debounce_flag = 1;
+		TCNT0 = 0; /* Reset Timer0 */
+		TIMSK0 |= (1 << OCIE0A); /* Set interrupt flag */
 
-	/* TIMER2 Setup TO Hz */
-	TCCR2A = 0b00100011; /* OC2A in Inverting mode
-						  * and set Mode To Fast PWM with TOP = 0xFF
-						  */
-	TCCR2B = 0b00000001; /* Set prescaler no prescaler */
-
-}
-
-void set_rgb(uint8_t r, uint8_t g, uint8_t b) {
-	OCR0B = r;
-	OCR0A = g;
-	OCR2B = b;
-}
-
-void wheel(uint8_t pos) {
-	pos = 255 - pos;
-	if (pos < 85) {
-		set_rgb(255 - pos * 3, 0, pos * 3);
-	} else if (pos < 170) {
-		pos = pos - 85;
-		set_rgb(0, pos * 3, 255 - pos * 3);
-	} else { pos = pos - 170;
-		set_rgb(pos * 3, 255 - pos * 3, 0);
+		press_dir = (EICRA & (1 << ISC00)); /* Get current press dir (pressing / releasing) */
 	}
+}
+
+ISR(TIMER0_COMPA_vect) {
+    static volatile uint8_t count = 0;
+    count++;
+    if (count >= DEBOUNCE_TIME) {
+        debounce_flag = 0;
+        count = 0;
+        TIMSK0 &= ~(1 << OCIE0A); /* Disable interrupt */
+		if (!press_dir)
+			PORTB ^= (1 << PB0); /* Toggle LED */
+		EICRA ^= (1 << ISC00); /* Toggle interrupt edge */
+    }
 }
 
 /* ************************************************************************** */
@@ -71,13 +79,9 @@ void wheel(uint8_t pos) {
 
 int main() {
 	init();
-	init_rgb();
+	sei(); /* Enable global interrupts */
 
-	while (1) {
-		for (volatile uint8_t i = 0; i < 255; i++) {
-			wheel(i);
-			_delay_ms(10);
-		}
-	}
+	while (1) {}
+
 	return (0);
 }
