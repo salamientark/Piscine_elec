@@ -15,8 +15,7 @@
 
 #define DEBOUNCE_TIME 3
 
-volatile uint8_t debounce_flag = 0;
-volatile uint8_t press_dir = 0;
+volatile uint8_t count_dir = 0;
 
 /** *All the information that I needed for this can be found at:
  *  - https://ww1.microchip.com/downloads/en/DeviceDoc/ATmega48A-PA-88A-PA-168A-PA-328-P-DS-DS40002061A.pdf
@@ -38,27 +37,42 @@ static void init(void) {
 	DDRB |= (1 << DDB1); /* Set PB0 as output */
 
 	/* TIMER0 INIT */
-	// TCCR0A |= (1 << COM0A1) | (1 << WGM00); /* PWM Phase correct */
-	// TCCR0B |= (1 << CS00); /* No prescaler */
-	// OCR0A = 127; /* Duty cycle value 50% of 0xFF */
-	// TIMSK0 |= (1 << OCIE0A); /* Enable interrupt */
+	TCCR0A |= (1 << WGM01) | (1 << WGM00); /* PWM Phase correct */
+	TCCR0B |= (1 << CS00); /* No prescaler */
+	OCR0A = 2; /* Duty cycle value 50% of 0xFF */
+	TIMSK0 |= (1 << OCIE0A); /* Enable interrupt */
 
 	/* TIMER1 INIT */
-	TCCR1A |= (1 << COM1A1) | (1 << WGM11) | (1 << WGM10); /* Mode Fast PWM, TOP OCR1A
-															* Clear OC1A on compare match, set OC1A at BOTTOM */
-	TCCR1B |= (1 << WGM13) | (1 << WGM12) | (1 << CS12) | (1 << CS10); /* Mode Fast PWM, TOP OCR1A
-														* No prescaler */
-	OCR1A = 0xFFFF; /* Duty cycle value 50% of 0xFF */
+	TCCR1A |= (1 << COM1A1) | (1 << WGM11); /* Mode Fast PWM, TOP ICR1
+											 * Clear OC1A on compare match, set OC1A at BOTTOM */
+	TCCR1B |= (1 << WGM13) | (1 << WGM12) | (1 << CS10); /* Mode Fast PWM, TOP ICR1
+														  * No prescaler */
+	ICR1 = 0xFFFF; /* Max TOP value for timer1 */
+	OCR1A = 0xFF; /* Duty cycle value 0% of 0xFF */
 
 	/* INTERRUPS INIT */
 	// EICRA |= (1 << ISC01); /* Falling edge of INT0 generate interrupts
 	// 						* When button is pressed generate interrupts*/
 	// EIMSK |= (1 << INT0); /* Activate interrupt on INT0 */
+	//
+	/* TESTING */
+	DDRB |= (1 << DDB1);
 }
 
-// ISR(TIMER0_COMPA_vect) {
-// 	PORTB ^= (1 << PB1); /* Toggle LED */
-// }
+ISR(TIMER0_COMPA_vect) {
+	if (count_dir == 0) {
+		OCR1A++;
+		if (OCR1A == 0xFFFF) {
+			count_dir = 1;
+		}
+	} else {
+		OCR1A--;
+		if (OCR1A == 0x0) {
+			count_dir = 0;
+		}
+	}
+	PORTB ^= (1 << PB1); /* Toggle LED */
+}
 
 /* ************************************************************************** */
 /*                                    MAIN                                    */
@@ -66,7 +80,7 @@ static void init(void) {
 
 int main() {
 	init();
-	// sei(); /* Enable global interrupts */
+	sei(); /* Enable global interrupts */
 
 	while (1) {}
 
