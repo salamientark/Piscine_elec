@@ -13,9 +13,10 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 
-#define DEBOUNCE_TIME 10
+#define DEBOUNCE_TIME 3
 
 volatile uint8_t debounce_flag = 0;
+volatile uint8_t press_dir = 0;
 
 /** *All the information that I needed for this can be found at:
  *  - https://ww1.microchip.com/downloads/en/DeviceDoc/ATmega48A-PA-88A-PA-168A-PA-328-P-DS-DS40002061A.pdf
@@ -35,14 +36,13 @@ volatile uint8_t debounce_flag = 0;
 static void init(void) {
 	/* LED INIT */
 	DDRB |= (1 << DDB0); /* Set PB0 as output */
+	PORTB &= ~(1 << PB0); /* Set PB0 to LOW */
 
 	/* TIMER INIT */
 	/* This is an attempt to solve bouncing */
 	TCCR0A |= (1 << WGM01); /* CTC mode */
 	TCCR0B |= (1 << CS02) | (1 << CS00); /* Prescaler 1024 */
-	// OCR0A = 154; /* Compare value 20ms | 50Hz*/
-	OCR0A = 255; /* Compare value 20ms | 50Hz*/
-	TIMSK0 |= (1 << OCIE0A); /* Enable interrupt on compare */
+	OCR0A = 255; /* Compare value 33ms | 30Hz*/
 
 	/* INTERRUPS INIT */
 	EICRA |= (1 << ISC01); /* Falling edge of INT0 generate interrupts
@@ -55,6 +55,8 @@ ISR(INT0_vect) {
 		debounce_flag = 1;
 		TCNT0 = 0; /* Reset Timer0 */
 		TIMSK0 |= (1 << OCIE0A); /* Set interrupt flag */
+
+		press_dir = (EICRA & (1 << ISC00)); /* Get current press dir (pressing / releasing) */
 	}
 }
 
@@ -65,7 +67,9 @@ ISR(TIMER0_COMPA_vect) {
         debounce_flag = 0;
         count = 0;
         TIMSK0 &= ~(1 << OCIE0A); /* Disable interrupt */
-		PORTB ^= (1 << PB0); /* Toggle LED */
+		if (!press_dir)
+			PORTB ^= (1 << PB0); /* Toggle LED */
+		EICRA ^= (1 << ISC00); /* Toggle interrupt edge */
     }
 }
 
@@ -75,7 +79,7 @@ ISR(TIMER0_COMPA_vect) {
 
 int main() {
 	init();
-	sei();
+	sei(); /* Enable global interrupts */
 
 	while (1) {}
 
