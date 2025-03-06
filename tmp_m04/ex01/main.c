@@ -13,8 +13,6 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 
-#define DEBOUNCE_TIME 3
-
 volatile uint8_t count_dir = 0;
 
 /** *All the information that I needed for this can be found at:
@@ -37,9 +35,9 @@ static void init(void) {
 	DDRB |= (1 << DDB1); /* Set PB0 as output */
 
 	/* TIMER0 INIT */
-	TCCR0A |= (1 << WGM01) | (1 << WGM00); /* PWM Phase correct */
-	TCCR0B |= (1 << CS00); /* No prescaler */
-	OCR0A = 2; /* Duty cycle value 50% of 0xFF */
+	TCCR0A |= (1 << WGM01); /* CTC */
+	TCCR0B |= (1 << CS02) | (0 << CS00); /* 64 prescaler */
+	OCR0A = 120; /* Duty cycle value 50% of 0xFF */
 	TIMSK0 |= (1 << OCIE0A); /* Enable interrupt */
 
 	/* TIMER1 INIT */
@@ -47,22 +45,14 @@ static void init(void) {
 											 * Clear OC1A on compare match, set OC1A at BOTTOM */
 	TCCR1B |= (1 << WGM13) | (1 << WGM12) | (1 << CS10); /* Mode Fast PWM, TOP ICR1
 														  * No prescaler */
-	ICR1 = 0xFFFF; /* Max TOP value for timer1 */
-	OCR1A = 0xFF; /* Duty cycle value 0% of 0xFF */
-
-	/* INTERRUPS INIT */
-	// EICRA |= (1 << ISC01); /* Falling edge of INT0 generate interrupts
-	// 						* When button is pressed generate interrupts*/
-	// EIMSK |= (1 << INT0); /* Activate interrupt on INT0 */
-	//
-	/* TESTING */
-	DDRB |= (1 << DDB1);
+	ICR1 = 0xFF; /* Max TOP value for timer1 */
+	OCR1A = 0x0; /* Duty cycle value 0% of 0xFF */
 }
 
 ISR(TIMER0_COMPA_vect) {
 	if (count_dir == 0) {
 		OCR1A++;
-		if (OCR1A == 0xFFFF) {
+		if (OCR1A == ICR1) {
 			count_dir = 1;
 		}
 	} else {
@@ -71,7 +61,6 @@ ISR(TIMER0_COMPA_vect) {
 			count_dir = 0;
 		}
 	}
-	PORTB ^= (1 << PB1); /* Toggle LED */
 }
 
 /* ************************************************************************** */
