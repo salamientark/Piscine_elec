@@ -10,7 +10,6 @@
 /* ************************************************************************** */
 
 #include <avr/io.h>
-#include <stdint.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
 
@@ -49,7 +48,7 @@ static void uart_init(void) {
 												        */
 	/* Set frame format: 8data bits, No parity, 1stop bit */
 	UCSR0C = 0B00000110; /* Set mode to:
-						  * Asynchronous USART
+		jjj				  * Asynchronous USART
 						  * No Parity
 						  * 1 Stop bit
 						  * 8-bit word size
@@ -63,7 +62,7 @@ static void uart_init(void) {
 */
 
 static void	adc_init(void) {
-	ADMUX = (1 << REFS0); /* Set reference voltage to AVCC and select ADC0 */
+	ADMUX = (1 << REFS0) | (1 << ADLAR); /* Set reference voltage to AVCC and select ADC0 */
 	ADCSRA = 0b10000010; /* Enable ADC
 						  * Set prescaler to 4 (8 bits) */
 	ADCSRB = 0b00000011; /* Set Auto-trigger source to Timer0 Compare Match A */
@@ -121,7 +120,7 @@ static uint8_t	adc_read(uint8_t ch) {
 	ADMUX = (ADMUX & 0b11111000) | ch; /* Enable only active channel */
 	ADCSRA |= (1 << ADSC); /* Start conversation */
 	while (!(ADCSRA & (1 << ADSC))) {} /* Wait until ADC conversation complete */
-	return (ADCL);
+	return (ADCH);
 }
 
 /* ************************************************************************** */
