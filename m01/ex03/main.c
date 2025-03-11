@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 16:31:16 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/04 13:56:31 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/05 15:25:29 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,8 @@ int main() {
 	while (1) {
 		b1_state = get_button_state(PD2);
 		b2_state = get_button_state(PD4);
-		if (b1_state == 0){ /// Pressed button
+
+		if (b1_state == 0 && b1_last_state == 1){ /// Pressed button
 			_delay_ms(20);
 			b1_last_state = 0;
 		}
