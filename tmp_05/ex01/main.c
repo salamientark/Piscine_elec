@@ -34,7 +34,7 @@ static void timer_init(void) {
 	// OCR0A = (uint8_t) 14; /* Compare value 20ms | 50Hz*/
 	TCCR0A |= (1 << WGM01); /* CTC mode */
 	TCCR0B |= (1 << CS02) | (1 << CS00); /* Prescaler 1024 */
-	OCR0A = F_CPU / 2 / 1024 / 500 - 1; /* Compare value 20ms | 50Hz*/
+	OCR0A = F_CPU / 2 / 1024 / 50 - 1; /* Compare value 20ms | 50Hz*/
 	TIMSK0 |= (1 << OCIE0A); /* Enable interrupt */
 }
 
@@ -66,6 +66,7 @@ static void	adc_init(void) {
 	ADCSRA = 0b10000010; /* Enable ADC
 						  * Set prescaler to 4 (8 bits) */
 	ADCSRB = 0b00000011; /* Set Auto-trigger source to Timer0 Compare Match A */
+	DIDR0 = 0b00111000; /* Enable digital input on ADC0 */
 }
 
 /**
@@ -101,8 +102,28 @@ static void uart_printstr(const char* str) {
 	}
 }
 
+/**
+ * @brief Send 8 bit hex value to UART Tx
+ *
+ * @param c - hex value to send
+ */
+static void uart_printhex(volatile unsigned char c) {
+	uint8_t val = c >> 4;
+	if (val < 10)
+		val += '0';
+	else
+		val += 'a' - 10;
+	uart_tx(val);
+	val = c & 0xF;
+	if (val < 10)
+		val += '0';
+	else
+		val += 'a' - 10;
+	uart_tx(val);
+}
+
 /* ************************************************************************** */
-/*                                   UART                                     */
+/*                                    ADC                                     */
 /* ************************************************************************** */
 
 /**
@@ -118,7 +139,7 @@ static uint8_t	adc_read(uint8_t ch) {
 					   */
 	ADMUX = (ADMUX & 0b11111000) | ch; /* Enable only active channel */
 	ADCSRA |= (1 << ADSC); /* Start conversation */
-	while (!(ADCSRA & (1 << ADSC))) {} /* Wait until ADC conversation complete */
+	while (ADCSRA & (1 << ADSC)) {} /* Wait until ADC conversation complete */
 	return (ADCH);
 }
 
@@ -128,21 +149,20 @@ static uint8_t	adc_read(uint8_t ch) {
 
 /* Read ADC val */
 ISR(TIMER0_COMPA_vect) {
+	/* READ Pot value */
 	uint8_t	adc = adc_read(0);
-	uint8_t val = adc >> 4;
-	if (val < 10)
-		val += '0';
-	else
-		val += 'a' - 10;
-	uart_tx(val);
-	val = adc & 0xF;
-	if (val < 10)
-		val += '0';
-	else
-		val += 'a' - 10;
-	uart_tx(val);
-	// uart_tx('k');
-	uart_printstr("\r\n");
+	uart_printhex(adc);
+	uart_printstr(", ");
+
+	/* READ LDR Value */
+	adc = adc_read(1);
+	uart_printhex(adc);
+	uart_printstr(", ");
+
+	// /* READ Temp */
+	// adc = adc_read(2);
+	// uart_printhex(adc);
+	uart_printstr("\n\n\r");
 }
 
 /* ************************************************************************** */
