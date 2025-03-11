@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 16:31:16 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/11 01:21:02 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/11 10:58:32 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,12 @@
 
 #define ADDR_WIDTH 7
 
-/*
- * EEPROM go from 0x00 to 0x3FF (1024 bytes)
+/** *All the information that I needed for this can be found at:
+ *  - https://ww1.microchip.com/downloads/en/DeviceDoc/ATmega48A-PA-88A-PA-168A-PA-328-P-DS-DS40002061A.pdf
+ *    - Schem at Page 12
+ *    - TIMER0 at Page 102-120
+ *    - Interrupts at page 66 - 78
+ *    - External Interrupts at Pages 79 - 84
  */
 
 /* ************************************************************************** */
@@ -35,13 +39,6 @@ void	init(void) {
 /* ************************************************************************** */
 /*                                   EEPROM                                   */
 /* ************************************************************************** */
-
-// unsigned char	eeprom_read(unsigned int addr) {
-// 	while (EECR & (1 << EEPE)) {} /* Wait until we can read/write EEPROM */
-// 	EEAR = addr; /* Set the address register to the desired EEPROM address */
-// 	EECR |= (1 << EERE); /* Start the read operation by setting EERE */
-// 	return (EEDR); /* Return the data from the data register */
-// }
 
 /**
  * @brief print address in hex format
@@ -61,15 +58,14 @@ void	print_addr(uintptr_t addr, uint8_t width) {
  * @param addr -- starting addr
  */
 void	print_memory(uintptr_t addr) {
-	uint8_t	mem[16] = {0};
+	unsigned char	mem[16] = {0};
 
 	print_addr(addr, ADDR_WIDTH);
 
-	eeprom_read_block((void *)mem, (const void *)(uintptr_t)addr, 16);
+	ft_eeprom_read_block(mem, addr, 16);
 	for (uint8_t i = 0; i < 16; i++) {
 		if (i % 2 == 0)
 			uart_tx(' ');
-		// uart_printhex(eeprom_read(addr + (uintptr_t)i));
 		uart_printhex(mem[i]);
 	}
 	uart_printstr("\r\n");
@@ -93,7 +89,6 @@ void	hexdump(void) {
 int main() {
 	init();
 
-	/* AHT20 Calibratiomn */
 	while (1) {
 		/* READ TEMP sensor */
 		hexdump();
