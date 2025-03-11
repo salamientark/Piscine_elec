@@ -17,6 +17,7 @@ INCLUDE_DIR := ./includes/
 
 SRC_DIR := src
 SRC_FILES := uart.c \
+			 hexdump.c \
 			 ft_lib.c \
 			 get_key_addr.c \
 			 parser.c \

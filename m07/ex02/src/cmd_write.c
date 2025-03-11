@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/11 18:39:32 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/11 19:54:43 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/11 23:38:34 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,6 @@ unsigned int	find_free_addr(const unsigned int data_len) {
 		}
 		if (enough_space(&i, data_len))
 			return (i);
-		
 	}
 	return (0xFFFF);
 }
@@ -83,16 +82,13 @@ void	cmd_write(const unsigned char *key, const unsigned char *val) {
 		return (uart_printstr("already exist\r\n"));
 	/* Create data block */
 	create_data_block(buff, key, val);
-	// uart_print_strtohex(buff);
 	while (buff[len])
 		len++;
-	uart_printstr("len: ");
-	uart_printdec(len);
-	uart_printstr("\r\n");
 	
 	addr = find_free_addr(len);
 	if (addr == 0xFFFF)
 		return (uart_printstr("no space left\r\n"));
+
 	/* Write block */
 	ft_eeprom_write_block(buff, addr, len);
 	uart_printstr("0x");

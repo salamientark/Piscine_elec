@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 12:38:17 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/11 19:34:21 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/11 23:05:23 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 # define MAGIC_NBR 0x1F
 # define DATA_MAX_SIZE 33
 # define READ_BUFFER_SIZE 100
+# define ADDR_WIDTH 7
 
 /* ************************************************************************** */
 /*                                   C_LIB                                    */

@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/11 18:26:02 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/11 19:12:48 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/11 23:45:26 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
  * @param addr -- key addr in EEPROM
  * @param buffer -- buffer to save the key
  */
-void get_key(const unsigned int addr, char *buffer) {
+void get_key(const unsigned int addr, unsigned char *buffer) {
 	unsigned int	ref = addr;
 	unsigned int	index = 0;
 
@@ -41,10 +41,10 @@ void get_key(const unsigned int addr, char *buffer) {
  */
 void	skip_data(unsigned int *i) {
 	if (is_limit(*i))
-		i += 2;
+		*i += 2;
 	while (!is_limit(*i))
-		i++;
-	i++;
+		(*i)++;
+	(*i)++;
 }
 
 /**
@@ -54,13 +54,17 @@ void	skip_data(unsigned int *i) {
  */
 unsigned int	get_key_addr(const unsigned char *key) {
 	unsigned int	key_len = ft_strlen(key);
+	unsigned int	eeprom_data_len;
 	unsigned int	addr = 0;
-	unsigned int	eeprom_data[DATA_MAX_SIZE] = {0};
+	unsigned char	eeprom_data[DATA_MAX_SIZE] = {0};
 
 	while (addr < E2END - key_len) {
+		for (unsigned int i = 0; i < DATA_MAX_SIZE; i++)
+			eeprom_data[i] = 0;
 		if (is_limit(addr)) {
-			get_key(addr, (char *)eeprom_data);
-			if (!ft_strncmp(key, (unsigned char *)eeprom_data, key_len))
+			get_key(addr, eeprom_data);
+			eeprom_data_len = ft_strlen(eeprom_data);
+			if (!ft_strncmp(key, (unsigned char *)eeprom_data, eeprom_data_len > key_len ? eeprom_data_len : key_len))
 				return (addr);
 			skip_data(&addr);
 		}
