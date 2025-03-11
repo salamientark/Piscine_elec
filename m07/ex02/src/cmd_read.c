@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/11 15:11:55 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/11 18:26:13 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/11 19:47:37 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ void	print_value(const unsigned int addr) {
 	index++;
 	while (ft_eeprom_read_byte(index) != MAGIC_NBR)
 		uart_tx(ft_eeprom_read_byte(index++));
+	uart_printstr("\r\n");
 }
 
 /**

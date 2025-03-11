@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/11 18:39:32 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/11 19:25:35 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/11 19:54:43 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,17 @@
 
 void	create_data_block(unsigned char *block, const unsigned char *key,
 		const unsigned char *val) {
-	block[0] = MAGIC_NBR;
-	block[1] = MAGIC_NBR;
-	ft_strcat(block, key);
-	block[ft_strlen(block)] = MAGIC_NBR;
-	ft_strcat(block, val);
-	block[ft_strlen(block)] = MAGIC_NBR;
-	block[ft_strlen(block)] = MAGIC_NBR;
+	unsigned int	block_i = 0;
+
+	block[block_i++] = MAGIC_NBR;
+	block[block_i++] = MAGIC_NBR;
+	for (unsigned int i = 0; key[i]; i++)
+		block[block_i++] = key[i];
+	block[block_i++] = MAGIC_NBR;
+	for (unsigned int i = 0; val[i]; i++)
+		block[block_i++] = val[i];
+	block[block_i++] = MAGIC_NBR;
+	block[block_i] = MAGIC_NBR;
 }
 
 /**
@@ -71,7 +75,7 @@ unsigned int	find_free_addr(const unsigned int data_len) {
  */
 void	cmd_write(const unsigned char *key, const unsigned char *val) {
 	unsigned char	buff[70] = {0}; /* 32 max data byte * 2 + sep + 2 * lim */
-	unsigned char	len;
+	unsigned char	len = 0;
 	unsigned int	addr = 0;
 
 	/* Check if key already exist */
@@ -79,13 +83,19 @@ void	cmd_write(const unsigned char *key, const unsigned char *val) {
 		return (uart_printstr("already exist\r\n"));
 	/* Create data block */
 	create_data_block(buff, key, val);
-	len = ft_strlen(buff);
+	// uart_print_strtohex(buff);
+	while (buff[len])
+		len++;
+	uart_printstr("len: ");
+	uart_printdec(len);
+	uart_printstr("\r\n");
 	
 	addr = find_free_addr(len);
 	if (addr == 0xFFFF)
 		return (uart_printstr("no space left\r\n"));
 	/* Write block */
-	ft_eeprom_read_block(buff, addr, len);
+	ft_eeprom_write_block(buff, addr, len);
+	uart_printstr("0x");
 	uart_printhex(addr >> 8);
 	uart_printhex(addr & 0xFF);
 	uart_printstr("\r\n");

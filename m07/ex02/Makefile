@@ -23,6 +23,7 @@ SRC_FILES := uart.c \
 			 cmd_read.c \
 			 cmd_print.c \
 			 cmd_forget.c \
+			 cmd_write.c \
 			 eeprom.c \
 			 main.c
 

@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/11 15:46:34 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/11 18:51:36 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/11 19:54:12 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,5 +119,5 @@ uint8_t	parse_cmd(const unsigned char *cmd, unsigned char *cmd_buff,
 		return (1);
 
 	skip_space(cmd, &cmd_i);
-	return (cmd_i == DATA_MAX_SIZE || cmd[cmd_i] != 0);
+	return (cmd_i == READ_BUFFER_SIZE || cmd[cmd_i] != 0);
 }

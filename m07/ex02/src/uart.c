@@ -60,6 +60,7 @@ void uart_printstr(const char* str) {
 		str++;
 	}
 }
+
 /**
  * @brief Print hex value to UART
  *
@@ -68,6 +69,22 @@ void uart_printstr(const char* str) {
 void	uart_printhex(unsigned char c) {
 	uart_tx((c >> 4) < 10 ? (c >> 4) + '0' : (c >> 4) + 'a' - 10);
 	uart_tx((c & 0xF) < 10 ? (c & 0xF) + '0' : (c & 0xF) + 'a' - 10);
+}
+
+/**
+ * @brief Print hex value to UART
+ *
+ * @param str -- string to print
+ */
+void	uart_print_strtohex(const unsigned char *str) {
+	unsigned int	i = 0;
+
+	while (str[i] != 0) {
+		if (i % 2 == 0)
+			uart_tx(' ');
+		uart_printhex(str[i]);
+		i++;
+	}
 }
 
 /**

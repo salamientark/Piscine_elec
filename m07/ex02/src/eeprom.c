@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/11 10:44:17 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/11 19:24:02 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/11 19:33:17 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,7 +130,7 @@ void	print_memory_c(unsigned int addr) {
 		if (mem[i] < ' ' || mem[i] > 0x7F)
 			uart_tx('.');
 		else
-		 uart_tx(mem[i]);
+			uart_tx(mem[i]);
 	}
 }
 

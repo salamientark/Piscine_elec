@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 12:38:17 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/11 19:24:16 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/11 19:34:21 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ uint8_t			uart_rx(void);
 void			uart_tx(const char c);
 void			uart_printstr(const char* str);
 void			uart_printhex(unsigned char c);
+void			uart_print_strtohex(const unsigned char *str);
 void			uart_printdec(unsigned int nbr);
 uint8_t			uart_read_input(unsigned char* buffer, const uint8_t size);
 
@@ -74,5 +75,7 @@ void			cmd_read(const unsigned char *key);
 void			cmd_print(void);
 /* cmd_forget.c */
 void			cmd_forget(const unsigned char *key);
+/* cmd_write.c */
+void			cmd_write(const unsigned char *key, const unsigned char *val);
 
 #endif
