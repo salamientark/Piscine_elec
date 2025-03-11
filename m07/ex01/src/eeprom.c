@@ -6,15 +6,11 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/11 10:44:17 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/11 12:58:25 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/11 23:00:40 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/atm328p.h"
-#include <avr/io.h>
-#include <stdint.h>
-
-#define ADDR_WIDTH 7
 
 /**
  * @brief Read a byte from the EEPROM
@@ -70,88 +66,3 @@ uint8_t	ft_eeprom_update_byte(unsigned int addr, unsigned char data) {
 	}
 	return (0);
 }
-
-/* ************************************************************************** */
-/*                                   HEXDUMP                                  */
-/* ************************************************************************** */
-
-/**
- * @brief print address in hex format
- *
- * @param addr -- address
- * @param width -- address width (nbr of char print)
- */
-void	print_addr(uintptr_t addr, uint8_t width) {
-	if (width != 0)
-		print_addr(addr >> 4, width - 1);
-	uart_tx((addr & 0xF) < 10 ? (addr & 0xF) + '0' : (addr & 0xF) + 'A' - 10);
-}
-
-/**
- * @brief print one memory line in hexdump format
- *
- * @param addr -- starting addr
- */
-void	print_memory(uintptr_t addr) {
-	unsigned char	mem[16] = {0};
-
-	print_addr(addr, ADDR_WIDTH);
-
-	ft_eeprom_read_block(mem, addr, 16);
-	for (uint8_t i = 0; i < 16; i++) {
-		if (i % 2 == 0)
-			uart_tx(' ');
-		uart_printhex(mem[i]);
-	}
-	uart_printstr("\r\n");
-}
-
-/**
- * @brief print one memory line in hexdump Showing modified bytes in red
- *
- * @param addr -- starting addr
- */
-void	print_memory_diff(uintptr_t start_addr, uintptr_t diff_addr) {
-	unsigned char	mem[16] = {0};
-
-	print_addr(start_addr, ADDR_WIDTH);
-
-	ft_eeprom_read_block(mem, start_addr, 16);
-	for (uint8_t i = 0; i < 16; i++) {
-		if (i % 2 == 0)
-			uart_tx(' ');
-		if (start_addr + i == diff_addr) {
-			uart_printstr("\033[31m");
-			uart_printhex(mem[i]);
-			uart_printstr("\033[0m");
-		}
-		else
-			uart_printhex(mem[i]);
-	}
-	uart_printstr("\r\n");
-}
-
-/**
- * @brief Hexdump of EEPROM
- */
-void	ft_hexdump(void) {
-	for (uintptr_t i = 0; i < E2END; i+= 16) {
-		print_memory(i);
-		_delay_ms(30);
-	}
-}
-
-/**
- * @brief print hexdump of EEPROM with diff
- *
- * @param addr -- address to show
- */
-void	ft_hexdiff(uint32_t addr){
-	for (uintptr_t i = 0; i < E2END; i += 16) {
-		if (addr >= i && addr < i + 16)
-			print_memory_diff(i, addr);
-		else
-			print_memory(i);
-		_delay_ms(10);
-	}
-} 

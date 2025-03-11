@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 16:31:16 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/11 12:56:14 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/11 22:58:57 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,10 +53,12 @@ uint32_t	str_to_hex(const unsigned char* buffer, uint8_t size) {
 		val <<= 4;
 		if ('0' <= buffer[i] && buffer[i] <= '9')
 			val |= buffer[i] - '0';
-		if ('a' <= buffer[i] && buffer[i] <= 'f')
+		else if ('a' <= buffer[i] && buffer[i] <= 'f')
 			val |= buffer[i] - 'a' + 10;
-		if ('A' <= buffer[i] && buffer[i] <= 'F')
+		else if ('A' <= buffer[i] && buffer[i] <= 'F')
 			val |= buffer[i] - 'A' + 10;
+		else
+			return 0xFFFFFFFF;
 	}
 	return (val);
 }
@@ -92,8 +94,8 @@ void	change_eeprom_byte(void) {
 		}
 		if (ft_eeprom_update_byte(addr, data))
 			ft_hexdiff(addr);
-		else
-			ft_hexdump();
+		// else
+		// 	ft_hexdump();
 	}
 }
 

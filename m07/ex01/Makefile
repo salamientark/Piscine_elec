@@ -18,6 +18,7 @@ INCLUDE_DIR := ./includes/
 SRC_DIR := src
 SRC_FILES := uart.c \
 			 eeprom.c \
+			 hexdump.c \
 			main.c
 
 OBJ_DIR := .obj
