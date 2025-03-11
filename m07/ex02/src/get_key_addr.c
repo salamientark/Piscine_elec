@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/11 18:26:02 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/11 18:30:11 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/11 19:12:48 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,11 +50,11 @@ void	skip_data(unsigned int *i) {
 /**
  * @brief Get key address from EEPROM
  * @param key -- Key to search in EEPROM
- * @return uintptr_t -- key address if found, else 0xFFFFFFFF
+ * @return unsigned int -- key address if found, else 0xFFFFFFFF
  */
-uintptr_t	get_key_addr(const unsigned char *key) {
+unsigned int	get_key_addr(const unsigned char *key) {
 	unsigned int	key_len = ft_strlen(key);
-	uintptr_t		addr = 0;
+	unsigned int	addr = 0;
 	unsigned int	eeprom_data[DATA_MAX_SIZE] = {0};
 
 	while (addr < E2END - key_len) {

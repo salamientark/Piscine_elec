@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/11 15:18:41 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/11 17:45:13 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/11 19:03:27 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,39 @@ uint8_t	ft_strcmp(const unsigned char *s1, const unsigned char *s2) {
 
 	}
 	return (s1[i] - s2[i]);
+}
+
+/**
+ * @brief Reworked ft_strcpy for atmega328p EEPROM operation
+ *
+ * WARNING no security !!!
+ * YOU must ensure that there will be no problem
+ * (Space overlap, not enough space...)
+ *
+ * @param src -- String to copy
+ * @param dest -- Destination
+ */
+void	ft_strcpy(unsigned char *dest, const unsigned char *src) {
+	unsigned int	i = 0;
+	while (src[i]) {
+		dest[i] = src[i];
+		i++;
+	}
+}
+
+
+/**
+ * @brief Append s2 to s1
+ *
+ * Warning YOU must ensure there is necessary space
+ *
+ * @param s1 -- First str
+ * @param s2 -- Second str
+ */
+void	ft_strcat(unsigned char *s1, const unsigned char *s2) {
+	unsigned char	*s1_end = s1 + ft_strlen(s1);
+
+	ft_strcpy(s1_end, s2);
 }
 
 

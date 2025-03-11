@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/11 10:44:17 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/11 18:13:45 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/11 19:24:02 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,18 @@ uint8_t	ft_eeprom_update_byte(unsigned int addr, unsigned char data) {
 	return (0);
 }
 
+/**
+ * @brief Write a full data block in the EEPROM
+ *
+ * @param buff -- buffer containing data
+ * @param addr -- EEPROM start address
+ * @param size -- data size
+ */
+void ft_eeprom_write_block(const unsigned char *buff, const unsigned int addr, const unsigned int size) {
+	for (unsigned int i = 0; i < size; i++)
+		ft_eeprom_write_byte(addr + i, buff[i]);
+}
+
 /* ************************************************************************** */
 /*                                   HEXDUMP                                  */
 /* ************************************************************************** */
@@ -81,7 +93,7 @@ uint8_t	ft_eeprom_update_byte(unsigned int addr, unsigned char data) {
  * @param addr -- address
  * @param width -- address width (nbr of char print)
  */
-void	print_addr(uintptr_t addr, uint8_t width) {
+void	print_addr(unsigned int addr, uint8_t width) {
 	if (width != 0)
 		print_addr(addr >> 4, width - 1);
 	uart_tx((addr & 0xF) < 10 ? (addr & 0xF) + '0' : (addr & 0xF) + 'A' - 10);
@@ -92,7 +104,7 @@ void	print_addr(uintptr_t addr, uint8_t width) {
  *
  * @param addr -- starting addr
  */
-void	print_memory(uintptr_t addr) {
+void	print_memory(unsigned int addr) {
 	unsigned char	mem[16] = {0};
 
 	print_addr(addr, ADDR_WIDTH);
@@ -110,11 +122,11 @@ void	print_memory(uintptr_t addr) {
  *
  * @param addr -- starting addr
  */
-void	print_memory_c(uintptr_t addr) {
+void	print_memory_c(unsigned int addr) {
 	unsigned char	mem[16] = {0};
 
 	ft_eeprom_read_block(mem, addr, 16);
-	for (uintptr_t i = 0; i < 16; i++) {
+	for (unsigned int i = 0; i < 16; i++) {
 		if (mem[i] < ' ' || mem[i] > 0x7F)
 			uart_tx('.');
 		else
@@ -127,7 +139,7 @@ void	print_memory_c(uintptr_t addr) {
  *
  * @param addr -- starting addr
  */
-void	print_memory_diff(uintptr_t start_addr, uintptr_t diff_addr) {
+void	print_memory_diff(unsigned int start_addr, unsigned int diff_addr) {
 	unsigned char	mem[16] = {0};
 
 	print_addr(start_addr, ADDR_WIDTH);
@@ -150,7 +162,7 @@ void	print_memory_diff(uintptr_t start_addr, uintptr_t diff_addr) {
  * @brief Hexdump of EEPROM
  */
 void	ft_hexdump(void) {
-	for (uintptr_t i = 0; i < E2END; i+= 16) {
+	for (unsigned int i = 0; i < E2END; i+= 16) {
 		print_memory(i);
 		uart_printstr("\r\n");
 		_delay_ms(50);
@@ -163,7 +175,7 @@ void	ft_hexdump(void) {
  * @param addr -- address to show
  */
 void	ft_hexdiff(uint32_t addr){
-	for (uintptr_t i = 0; i < E2END; i += 16) {
+	for (unsigned int i = 0; i < E2END; i += 16) {
 		if (addr >= i && addr < i + 16)
 			print_memory_diff(i, addr);
 		else
@@ -179,7 +191,7 @@ void	ft_hexdiff(uint32_t addr){
  * Hexdump in human readble format
  */
 void	ft_hexdump_c(void) {
-	for (uintptr_t i = 0; i < E2END; i+= 16) {
+	for (unsigned int i = 0; i < E2END; i+= 16) {
 		print_memory(i);
 		uart_printstr(" |");
 		print_memory_c(i);

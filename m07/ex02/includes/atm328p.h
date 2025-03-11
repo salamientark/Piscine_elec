@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 12:38:17 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/11 18:33:10 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/11 19:24:16 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,8 @@ uint8_t			is_limit(const unsigned int addr);
 uint8_t			ft_strcmp(const unsigned char *s1, const unsigned char *s2);
 uint8_t			ft_strncmp(const unsigned char *s1, const unsigned char *s2, unsigned int n);
 unsigned int	ft_strlen(const unsigned char *str);
+void			ft_strcat(unsigned char *s1, const unsigned char *s2);
+void			ft_strcpy(unsigned char *dest, const unsigned char *src);
 uint32_t		str_to_hex(const unsigned char* buffer, uint8_t size);
 
 /* ************************************************************************** */
@@ -48,6 +50,7 @@ unsigned char	ft_eeprom_read_byte(unsigned int addr);
 void			ft_eeprom_read_block(unsigned char *buffer, unsigned int addr,
 					const unsigned int size);
 void			ft_eeprom_write_byte(unsigned int addr, unsigned char data);
+void			ft_eeprom_write_block(const unsigned char *buff, const unsigned int addr, const unsigned int size);
 uint8_t			ft_eeprom_update_byte(unsigned int addr, unsigned char data);
 void			ft_hexdump(void);
 void			ft_hexdump_c(void);
@@ -62,7 +65,8 @@ uint8_t			parse_cmd(const unsigned char *cmd, unsigned char *cmd_buff,
 					unsigned char *prm_1_buff, unsigned char *prm_2_buff);
 
 /* get_key_addr.c */
-uintptr_t	get_key_addr(const unsigned char *key);
+void			skip_data(unsigned int *i);
+unsigned int	get_key_addr(const unsigned char *key);
 
 /* cmd_read.c */
 void			cmd_read(const unsigned char *key);

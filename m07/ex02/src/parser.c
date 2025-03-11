@@ -6,12 +6,11 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/11 15:46:34 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/11 18:38:11 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/11 18:51:36 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/atm328p.h"
-#include <stdint.h>
 
 /**
  * @brief Check if cmd is a known command
