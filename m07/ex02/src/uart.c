@@ -89,7 +89,7 @@ void	uart_printdec(unsigned int nbr) {
 * @return uint8_t -- number of characters read
  */
 uint8_t uart_read_input(unsigned char* buffer, const uint8_t size) {
-    char    c;
+    unsigned char    c;
     uint8_t index = 0;
 
     while (1) {
@@ -110,7 +110,7 @@ uint8_t uart_read_input(unsigned char* buffer, const uint8_t size) {
         }
         if (index == size - 1) /* Buffer end reached */
             continue ;
-        if (c < ' ') /* Non printable char */
+        if (c < ' ' || c > 127) /* Non printable char */
             continue ;
         buffer[index] = c;
 		uart_tx(c);

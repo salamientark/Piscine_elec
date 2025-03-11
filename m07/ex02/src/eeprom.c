@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/11 10:44:17 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/11 12:58:25 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/11 18:13:45 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,23 @@ void	print_memory(uintptr_t addr) {
 			uart_tx(' ');
 		uart_printhex(mem[i]);
 	}
-	uart_printstr("\r\n");
+}
+
+/**
+ * @brief print one memory line in hexdump -c format
+ *
+ * @param addr -- starting addr
+ */
+void	print_memory_c(uintptr_t addr) {
+	unsigned char	mem[16] = {0};
+
+	ft_eeprom_read_block(mem, addr, 16);
+	for (uintptr_t i = 0; i < 16; i++) {
+		if (mem[i] < ' ' || mem[i] > 0x7F)
+			uart_tx('.');
+		else
+		 uart_tx(mem[i]);
+	}
 }
 
 /**
@@ -128,7 +144,6 @@ void	print_memory_diff(uintptr_t start_addr, uintptr_t diff_addr) {
 		else
 			uart_printhex(mem[i]);
 	}
-	uart_printstr("\r\n");
 }
 
 /**
@@ -137,7 +152,8 @@ void	print_memory_diff(uintptr_t start_addr, uintptr_t diff_addr) {
 void	ft_hexdump(void) {
 	for (uintptr_t i = 0; i < E2END; i+= 16) {
 		print_memory(i);
-		_delay_ms(30);
+		uart_printstr("\r\n");
+		_delay_ms(50);
 	}
 }
 
@@ -152,6 +168,22 @@ void	ft_hexdiff(uint32_t addr){
 			print_memory_diff(i, addr);
 		else
 			print_memory(i);
+		uart_printstr("\r\n");
 		_delay_ms(10);
 	}
 } 
+
+/**
+ * @brief EEPROM Hexdump -C
+ *
+ * Hexdump in human readble format
+ */
+void	ft_hexdump_c(void) {
+	for (uintptr_t i = 0; i < E2END; i+= 16) {
+		print_memory(i);
+		uart_printstr(" |");
+		print_memory_c(i);
+		uart_printstr("|\r\n");
+		_delay_ms(30);
+	}
+}

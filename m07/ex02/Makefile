@@ -18,8 +18,11 @@ INCLUDE_DIR := ./includes/
 SRC_DIR := src
 SRC_FILES := uart.c \
 			 ft_lib.c \
+			 get_key_addr.c \
 			 parser.c \
 			 cmd_read.c \
+			 cmd_print.c \
+			 cmd_forget.c \
 			 eeprom.c \
 			 main.c
 

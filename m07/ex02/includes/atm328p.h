@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 12:38:17 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/11 16:36:59 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/11 18:33:10 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 
 # define MAGIC_NBR 0x1F
 # define DATA_MAX_SIZE 33
+# define READ_BUFFER_SIZE 100
 
 /* ************************************************************************** */
 /*                                   C_LIB                                    */
@@ -49,15 +50,25 @@ void			ft_eeprom_read_block(unsigned char *buffer, unsigned int addr,
 void			ft_eeprom_write_byte(unsigned int addr, unsigned char data);
 uint8_t			ft_eeprom_update_byte(unsigned int addr, unsigned char data);
 void			ft_hexdump(void);
+void			ft_hexdump_c(void);
 void			ft_hexdiff(uint32_t addr);
 
 /* ************************************************************************** */
 /*                                    CMD                                     */
 /* ************************************************************************** */
+
 /* parser.c */
 uint8_t			parse_cmd(const unsigned char *cmd, unsigned char *cmd_buff,
 					unsigned char *prm_1_buff, unsigned char *prm_2_buff);
+
+/* get_key_addr.c */
+uintptr_t	get_key_addr(const unsigned char *key);
+
 /* cmd_read.c */
 void			cmd_read(const unsigned char *key);
+/* cmd_print.c */
+void			cmd_print(void);
+/* cmd_forget.c */
+void			cmd_forget(const unsigned char *key);
 
 #endif

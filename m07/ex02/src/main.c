@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 16:31:16 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/11 17:59:11 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/11 18:34:20 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,12 +89,16 @@ void	exec_cmd(const unsigned char *cmd) {
 	unsigned char	prm_1_buffer[32] = {0};
 	unsigned char	prm_2_buffer[32] = {0};
 
-	if (parse_cmd(cmd, cmd_buffer, prm_1_buffer, prm_2_buffer) != 0) {
-		uart_printstr("\033[31mInvalid cmd\033[0m\r\n");
-	}
-	else
-		uart_printstr("\033[32mValid cmd\033[0m\r\n");
+	if (parse_cmd(cmd, cmd_buffer, prm_1_buffer, prm_2_buffer) != 0)
+		return (uart_printstr("\033[31mInvalid cmd\033[0m\r\n"));
+	uart_printstr("\033[32mValid cmd\033[0m\r\n");
 	test_print_cmd(cmd_buffer, prm_1_buffer, prm_2_buffer);
+	if (!ft_strcmp((const unsigned char *)"PRINT", cmd_buffer))
+		return (cmd_print());
+	if (!ft_strcmp((const unsigned char *)"READ", cmd_buffer))
+		return (cmd_read(prm_1_buffer));
+	if (!ft_strcmp((const unsigned char *)"FORGET", cmd_buffer))
+		return (cmd_forget(prm_1_buffer));
 }
 	
 
@@ -104,7 +108,7 @@ void	exec_cmd(const unsigned char *cmd) {
 int main() {
 	init();
 
-	unsigned char	buffer[100] = {0};
+	unsigned char	buffer[READ_BUFFER_SIZE] = {0};
 
 	uart_printstr("==================== WELCOME ===================\r\n\n");
 
@@ -112,7 +116,7 @@ int main() {
 		for (uint8_t i = 0; i < DATA_MAX_SIZE; i++)
 			buffer[i] = 0;
 		uart_printstr("> ");
-		uart_read_input((unsigned char *)buffer, DATA_MAX_SIZE);
+		uart_read_input((unsigned char *)buffer, READ_BUFFER_SIZE);
 		exec_cmd(buffer);
 	}
 	

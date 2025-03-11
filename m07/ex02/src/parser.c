@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/11 15:46:34 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/11 17:58:46 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/11 18:38:11 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ uint8_t	is_valid_cmd(const unsigned char *cmd) {
 void	get_cmd_part(const unsigned char *cmd, unsigned char *buff) {
 	uint8_t	i = 0;
 
-	while (i < 32 && cmd[i] && cmd[i] != ' ') {
+	while (i < DATA_MAX_SIZE - 1 && cmd[i] && cmd[i] != ' ') {
 		buff[i] = cmd[i];
 		i++;
 	}
@@ -55,16 +55,16 @@ void	get_cmd_part(const unsigned char *cmd, unsigned char *buff) {
 uint8_t	get_param(const unsigned char *cmd, unsigned char *buff, uint8_t *pos) {
 	uint8_t	buff_i = 0;
 
-	if (*pos == DATA_MAX_SIZE)
+	if (*pos == READ_BUFFER_SIZE)
 		return (1);
 	if (cmd[*pos] != '\"')
 		return (1);
 	(*pos)++;
-	while (*pos < DATA_MAX_SIZE && cmd[*pos] && cmd[*pos] != '\"') {
+	while (*pos < READ_BUFFER_SIZE && buff_i < DATA_MAX_SIZE - 1 && cmd[*pos] && cmd[*pos] != '\"') {
 		buff[buff_i++] = cmd[*pos];
 		(*pos)++;
 	}
-	if (*pos == DATA_MAX_SIZE || cmd[*pos] != '\"')
+	if (*pos == READ_BUFFER_SIZE || cmd[*pos] != '\"')
 		return (1);
 	(*pos)++;
 	return (0);
@@ -77,7 +77,7 @@ uint8_t	get_param(const unsigned char *cmd, unsigned char *buff, uint8_t *pos) {
  * @param pos -- position in cmd
  */
 void	skip_space(const unsigned char *cmd, uint8_t *pos) {
-	while (*pos < DATA_MAX_SIZE && cmd[*pos] == ' ')
+	while (*pos < READ_BUFFER_SIZE && cmd[*pos] == ' ')
 		(*pos)++;
 }
 
