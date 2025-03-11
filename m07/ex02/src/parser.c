@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/11 15:46:34 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/11 17:18:34 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/11 17:58:46 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,11 +61,12 @@ uint8_t	get_param(const unsigned char *cmd, unsigned char *buff, uint8_t *pos) {
 		return (1);
 	(*pos)++;
 	while (*pos < DATA_MAX_SIZE && cmd[*pos] && cmd[*pos] != '\"') {
-		buff[buff_i] = cmd[*pos];
+		buff[buff_i++] = cmd[*pos];
 		(*pos)++;
 	}
 	if (*pos == DATA_MAX_SIZE || cmd[*pos] != '\"')
 		return (1);
+	(*pos)++;
 	return (0);
 }
 
@@ -75,8 +76,8 @@ uint8_t	get_param(const unsigned char *cmd, unsigned char *buff, uint8_t *pos) {
  * @param cmd -- Readline result
  * @param pos -- position in cmd
  */
-void	skip_space(const unsigned char *cmd, volatile uint8_t *pos) {
-	while (*pos < DATA_MAX_SIZE && cmd[*pos] && cmd[*pos] == ' ')
+void	skip_space(const unsigned char *cmd, uint8_t *pos) {
+	while (*pos < DATA_MAX_SIZE && cmd[*pos] == ' ')
 		(*pos)++;
 }
 
@@ -93,37 +94,31 @@ uint8_t	parse_cmd(const unsigned char *cmd, unsigned char *cmd_buff,
 					unsigned char *prm_1_buff, unsigned char *prm_2_buff) {
 	uint8_t	cmd_i = 0;
 
-	uart_printstr("Let's parse\r\n");
-
 	get_cmd_part(cmd, cmd_buff); /* Extract command part */
 	if (!is_valid_cmd(cmd_buff)) /* Check for validity */
 		return (1);
 	cmd_i = ft_strlen(cmd_buff); /* Set cmd_i at end of word */
-
-	uart_printstr("Valid cmd_part\r\n");
-
 	skip_space(cmd, &cmd_i); /* Skip space */
 
-	uart_printstr("Skipped space: index: ");
-	uart_printdec(cmd_i);
-	uart_printstr("\r\n");
-
 	/* Check if command is PRINT and have parameter */
-	if (!ft_strcmp(cmd_buff, (const unsigned char *)"PRINT")) 
-		return (cmd[cmd_i] == 0);
-
-	uart_printstr("Valid PRINT Check\r\n");
+	if (!ft_strcmp(cmd_buff, (const unsigned char *)"PRINT"))
+		return (cmd[cmd_i] != 0);
 	
 	if (get_param(cmd, prm_1_buff, &cmd_i)) /* Extract first param part */
+		return (1);
+	if (ft_strlen(prm_1_buff) == 0)
 		return (1);
 	skip_space(cmd, &cmd_i);
 
     /* Check if FORGET or READ Have too much parameter */
-	if (ft_strcmp((const unsigned char *)"WRITE", cmd_buff) != 0 && cmd[cmd_i] != 0) 
-		return (1);
+	if (ft_strcmp((const unsigned char *)"WRITE", cmd_buff) != 0) /* Valid READ / FORGET */
+		return (cmd[cmd_i] != 0);
+
 	if (get_param(cmd, prm_2_buff, &cmd_i))
+		return (1);
+	if (ft_strlen(prm_2_buff) == 0)
 		return (1);
 
 	skip_space(cmd, &cmd_i);
-	return (cmd_i == DATA_MAX_SIZE || cmd[cmd_i] == 0);
+	return (cmd_i == DATA_MAX_SIZE || cmd[cmd_i] != 0);
 }

@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/11 15:18:41 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/11 16:37:11 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/11 17:45:13 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@ uint8_t	ft_strcmp(const unsigned char *s1, const unsigned char *s2) {
 		if (s1[i] != s2[i])
 			return (s1[i] - s2[i]);
 		i++;
+
 	}
 	return (s1[i] - s2[i]);
 }

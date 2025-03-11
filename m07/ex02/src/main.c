@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 16:31:16 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/11 17:15:27 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/11 17:59:11 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ void	exec_cmd(const unsigned char *cmd) {
 	unsigned char	prm_1_buffer[32] = {0};
 	unsigned char	prm_2_buffer[32] = {0};
 
-	if (parse_cmd(cmd, cmd_buffer, prm_1_buffer, prm_2_buffer)) {
+	if (parse_cmd(cmd, cmd_buffer, prm_1_buffer, prm_2_buffer) != 0) {
 		uart_printstr("\033[31mInvalid cmd\033[0m\r\n");
 	}
 	else
@@ -104,7 +104,7 @@ void	exec_cmd(const unsigned char *cmd) {
 int main() {
 	init();
 
-	unsigned char	buffer[DATA_MAX_SIZE] = {0};
+	unsigned char	buffer[100] = {0};
 
 	uart_printstr("==================== WELCOME ===================\r\n\n");
 
