@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/12 23:12:54 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/13 00:18:23 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/13 00:20:35 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,17 +52,12 @@ uint8_t	is_valid_hex(const unsigned char *buff, const uint8_t size) {
 uint8_t	valid_mask(const unsigned char *buff, const unsigned int pos) {
 	if (pos > READ_SIZE - 8) /* Prtection for invalid access */
 		return (0);
-	uart_printstr("protection overflow OK\r\n");
-	uart_printhex(buff[pos + 8]);
 	if (buff[pos + 8] != 0 && buff[pos + 8] != ' ' && buff[pos + 8] != '\r')
 		return (0);
-	uart_printstr("Size OK\r\n");
 	if (buff[pos + 6] != 'D')
 		return (0);
-	uart_printstr("D indicator OK\r\n");
 	if (!('6' <= buff[pos + 7] && buff[pos + 7] <= '8'))
 		return (0);
-	uart_printstr("Led number valid OK\r\n");
 	return (1);
 }
 
@@ -83,9 +78,6 @@ uint32_t	parse(const unsigned char *buff) {
 	skip_space(buff, &i);
 	if (buff[i++] != '#')
 		return (uart_printstr("\033[31mInvalid input\033[0m\r\n"), 0);
-
-	uart_printstr("Valid #\r\n");
-
 	if (!ft_strncmp((const unsigned char *)"FULLRAINBOW", buff + i, 10)) {
 		i += 11;
 		skip_space(buff, &i);
@@ -95,20 +87,15 @@ uint32_t	parse(const unsigned char *buff) {
 		TIMSK0 |= (1 << OCIE0A); /* Set interrupts to activat Rainbow */
 		return (0xFF);
 	}
-	uart_printstr("Not FULLRAINBOW #\r\n");
 	if (!valid_mask(buff, i))
 		return (uart_printstr("\033[31mInvalid input\033[0m\r\n"), 0);
-	uart_printstr("Valid mask\r\n");
 	if (!is_valid_hex(buff + i, 8))
 		return (uart_printstr("\033[31mInvalid input\033[0m\r\n"), 0);
-	uart_printstr("Valid HEX\r\n");
 	res = str_to_hex(buff + i, 8);
 	i += 8;
 	skip_space(buff, &i);
-	uart_printhex(buff[i]);
 	if (buff[i] != 0 && buff[i] != '\r')
 		return (uart_printstr("\033[31mInvalid input\033[0m\r\n"), 0);
-	uart_printstr("\033[32mValid INPUT\033[0m\r\n");
 	TIMSK0 &= ~(1 << OCIE0A);
 	return (res);
 }
