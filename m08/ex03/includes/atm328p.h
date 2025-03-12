@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 12:38:17 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/12 21:56:51 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/12 21:35:32 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,14 +24,14 @@
 # define SCK PB5 /* SPI CLOCK PIN */
 
 # define SPI_OFF		0x00
-# define SPI_RED		0x1FFF0000
-# define SPI_GREEN		0x1F00FF00
-# define SPI_BLUE		0x1F0000FF
-# define SPI_YELLOW		0x1FFFFF00
-# define SPI_CYAN		0x1F00FFFF
-# define SPI_MAGENTA	0x1FFF00FF
+# define SPI_RED		0x00FF0000
+# define SPI_GREEN		0x0000FF00
+# define SPI_BLUE		0x000000FF
+# define SPI_YELLOW		0x00FFFF00
+# define SPI_CYAN		0x0000FFFF
+# define SPI_MAGENTA	0x00FF00FF
 
-# define SPI_WHITE		0x1FFFFFFF
+# define SPI_WHITE		0x00FFFFFF
 
 # define STEP (double)(255. / 3.) /* Step For ADC conversion */
 

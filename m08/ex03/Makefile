@@ -17,6 +17,7 @@ INCLUDE_DIR := ./includes/
 
 SRC_DIR := src
 SRC_FILES := uart.c \
+			 adc.c \
 			 ft_lib.c \
 			 spi.c \
 			 led_ada102.c \

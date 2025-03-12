@@ -6,11 +6,13 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 16:31:16 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/12 21:57:39 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/12 21:50:54 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/atm328p.h"
+#include <stdint.h>
+#include <util/delay.h>
 
 
 /** *All the information that I needed for this can be found at:
@@ -30,6 +32,7 @@
  */
 void	init(void) {
 	uart_init();
+	adc_init();
 	spi_init_master();
 }
 
@@ -45,23 +48,33 @@ void	init(void) {
 // 	uart_printstr("\r\n");
 // }
 //
+/**
+ * @brief Set LED color and brightness based on adc value
+ *
+ * @parma adc -- readed adc value (8 bit)
+ */
+void	set_adc_color(const uint8_t adc) {
+	unsigned int	b1 = (adc < STEP ? adc : STEP) / STEP * 31.;
+	unsigned int	b2 = adc > STEP ? (adc < 2 * STEP ? (adc - STEP) / STEP * 31 : 31) : 0;
+	unsigned int	b3 = adc > 2 * STEP ? (adc - 2 * STEP) / (255. - 2 * STEP) * 31 : 0;
+
+	/* Set LED COLOR */
+	spi_set_led((0xE0 | ((uint32_t)(uint8_t)b1 & 0x1F)) << 24 | SPI_RED,
+				(0xE0 | ((uint32_t)(uint8_t)b2 & 0x1F)) << 24 | SPI_YELLOW,
+				(0xE0 | ((uint32_t)(uint8_t)b3 & 0x1F)) << 24 | SPI_GREEN);
+}
 
 /* ************************************************************************** */
 /*                                    MAIN                                    */
 /* ************************************************************************** */
 
 int main() {
-	init();
+	uint8_t	adc_val;
 
+	init();
 	while (1) {
-		spi_set_led(SPI_OFF, SPI_OFF, SPI_OFF);
-		_delay_ms(250);
-		spi_set_led(SPI_WHITE, SPI_OFF, SPI_OFF);
-		_delay_ms(250);
-		spi_set_led(SPI_OFF, SPI_WHITE, SPI_OFF);
-		_delay_ms(250);
-		spi_set_led(SPI_OFF, SPI_OFF, SPI_WHITE);
-		_delay_ms(250);
+		adc_val = adc_read(0);
+		set_adc_color(adc_val);
 	}
 	
 	return (0);
