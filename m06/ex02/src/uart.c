@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 12:35:51 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/10 00:26:20 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/11 10:37:42 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,23 +61,13 @@ void uart_printstr(const char* str) {
 		str++;
 	}
 }
-
 /**
  * @brief Print hex value to UART
  *
  * @param c -- char
  */
-void uart_printhex(unsigned char c) {
-    uint8_t val = c >> 4;
-    if (val < 10)
-        val += '0';
-    else
-        val += 'a' - 10;
-    uart_tx(val);
-    val = c & 0xF;
-    if (val < 10)
-        val += '0';
-    else
-        val += 'a' - 10;
-    uart_tx(val);
+void	print_hex_value(unsigned char c) {
+	uart_tx((c >> 4) < 10 ? (c >> 4) + '0' : (c >> 4) + 'A' - 10);
+	uart_tx((c & 0xF) < 10 ? (c & 0xF) + '0' : (c & 0xF) + 'A' - 10);
 }
+
