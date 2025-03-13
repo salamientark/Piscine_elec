@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 12:38:17 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/12 23:47:27 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/13 11:48:33 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,11 @@
 
 # define SPI_WHITE		0x00FFFFFF
 
-# define READ_SIZE		16
+# define READ_SIZE 33
+
+/* ALIASES */
+# define BUTTON1 PD2
+# define BUTTON2 PD4
 
 /* ************************************************************************** */
 /*                                   C_LIB                                    */
@@ -48,6 +52,13 @@ void			ft_memset(unsigned char *buff, const unsigned int byte,
 					const unsigned int size);
 uint32_t		str_to_hex(const unsigned char* buffer, uint8_t size);
 
+
+/* ************************************************************************** */
+/*                                  BUTTON                                    */
+/* ************************************************************************** */
+void			button_init(void);
+uint8_t			read_button(const uint8_t port, const uint8_t pin);
+
 /* ************************************************************************** */
 /*                                   UART                                     */
 /* ************************************************************************** */
@@ -61,9 +72,10 @@ void			uart_printdec(unsigned int nbr);
 uint8_t			uart_read_input(unsigned char* buffer, const uint8_t size);
 
 /* ************************************************************************** */
-/*                                   PARSER                                   */
+/*                                     ADC                                    */
 /* ************************************************************************** */
-uint32_t		parse(const unsigned char *buff);
+void			adc_init(void);
+uint8_t			adc_read(uint8_t ch);
 
 /* ************************************************************************** */
 /*                                    SPI                                     */

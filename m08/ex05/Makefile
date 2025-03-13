@@ -18,7 +18,8 @@ INCLUDE_DIR := ./includes/
 SRC_DIR := src
 SRC_FILES := uart.c \
 			 ft_lib.c \
-			 parser.c \
+			 button.c \
+			 adc.c \
 			 spi.c \
 			 led_ada102.c \
 			 main.c

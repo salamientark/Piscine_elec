@@ -6,17 +6,20 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 16:31:16 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/13 00:13:06 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/13 13:51:21 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/atm328p.h"
 #include <avr/io.h>
 #include <stdint.h>
+#include <util/delay.h>
 
-uint32_t	led_1 = 0;
-uint32_t	led_2 = 0;
-uint32_t	led_3 = 0;
+uint8_t		g_led_select = 0; /* Led select */
+uint8_t 	g_color = 0; /* color select */
+uint32_t	g_led_1 = 0xFF000000;
+uint32_t	g_led_2 = 0xFF000000;
+uint32_t	g_led_3 = 0xFF000000;
 
 /** *All the information that I needed for this can be found at:
  *  - https://ww1.microchip.com/downloads/en/DeviceDoc/ATmega48A-PA-88A-PA-168A-PA-328-P-DS-DS40002061A.pdf
@@ -34,16 +37,10 @@ uint32_t	led_3 = 0;
  * @brief Initialize mmcu
  */
 void	init(void) {
-	/* Timer setup */
-	TCCR0A |= (1 << WGM01); /* Set CTC mode */
-	TCCR0B |= (1 << CS02) | (1 << CS00); /* Prescaler 1024 */
-	OCR0A = 92; /* Set compare limit */
-
+	adc_init();
+	button_init();
 	uart_init();
 	spi_init_master();
-
-	/* Interrupts Enable */
-	SREG |= (1 << 7);
 }
 
 /* ************************************************************************** */
@@ -84,33 +81,61 @@ ISR(TIMER0_COMPA_vect) {
 /* ************************************************************************** */
 /*                                    MAIN                                    */
 /* ************************************************************************** */
+/**
+ * @brief Set value
+ *
+ * @param adc -- ADC readed value
+ */
+void	set_led_value(const uint8_t adc) {
+	uint32_t	mask = ~(0 | ((uint32_t)255 << (8 * (2 - g_color))));
+	uint32_t	color = (uint32_t)adc << (8 * (2 - g_color));
 
-void	exec(unsigned char *buff) {
-	uint8_t	led;
-	uint32_t	val = parse(buff);
-
-	if (val == 0 || val == 0xFF)
-		return ;
-	led = val & 0xF;
-	if (led == 6)
-		led_1 = (0xFF000000 | (val >> 8));
-	if (led == 7)
-		led_2 = (0xFF000000 | (val >> 8));
-	if (led == 8)
-		led_3 = (0xFF000000 | (val >> 8));
-	spi_set_led(led_1, led_2, led_3);
+	if (g_led_select == 0)
+		g_led_1 = ((g_led_1 & mask) | color);
+	if (g_led_select == 1)
+		g_led_2 = ((g_led_2 & mask) | color);
+	if (g_led_select == 2)
+		g_led_3 = ((g_led_3 & mask) | color);
+	spi_set_led(g_led_1, g_led_2, g_led_3);
 }
 
 int main() {
-	init();
+	uint8_t	adc = 0;
+	uint8_t	b1_state = 1;
+	uint8_t	b2_state = 1;
+	uint8_t	b1_last_state = 1;
+	uint8_t	b2_last_state = 1;
 
+
+	init();
 	spi_set_led(0, 0, 0);
-	// TIMSK0 |= (1 << OCIE0A); /* Enable interrupts on copmare match */
-	unsigned char	buff[READ_SIZE];
 	while (1) {
-		ft_memset(buff, 0x00, READ_SIZE);
-		uart_read_input(buff, READ_SIZE);
-		exec(buff);
+		b1_state = read_button(PIND, BUTTON1);
+		b2_state = read_button(PIND, BUTTON2);
+		if (b1_state == 0 && b1_last_state == 1) { /* Button 1 pressed */
+			_delay_ms(20);
+			g_color = (g_color + 1) % 3; /* Change color ch */
+			b1_last_state = 0;
+			continue ;
+		}
+		if (b2_state == 0 && b2_last_state == 1) { /* Button 2 pressed */
+			_delay_ms(20);
+			g_color = 0; /* Modify RED */
+			g_led_select = (g_led_select + 1) % 3; /* Change led */
+			b2_last_state = 0;
+			continue ;
+		}
+		if (b1_last_state == 0 && b1_state) {
+			_delay_ms(20);
+			b1_last_state = 1;
+		}
+		if (b2_last_state == 0 && b2_state) {
+			_delay_ms(20);
+			b2_last_state = 1;
+		}
+		adc = adc_read(0);
+		set_led_value(adc);
+		_delay_ms(100);
 	}
 	
 	return (0);
