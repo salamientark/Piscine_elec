@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 12:38:17 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/13 18:18:49 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/14 00:22:26 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,27 @@
 # include <util/twi.h>
 
 # define READ_SIZE		16
+
+/* PCA9555 */
+# define IO_EXPAND_ADDR 0x20
+
+/* PCA9555 ALIASES */
+#define PCA9555_I0 0x00 /* INPUT PORT 0 */
+#define PCA9555_I1 0x01 /* INPUT PORT 1 */
+#define PCA9555_O0 0x02 /* OUTPUT PORT 0 */
+#define PCA9555_O1 0x03 /* OUTPUT PORT 1 */
+#define PCA9555_P0 0x04 /* POLARITY INVERSION PORT 0 */
+#define PCA9555_P1 0x05 /* POLARITY INVERSION PORT 0 */
+#define PCA9555_C0 0x06 /* CONFIGURATION PORT 0 */
+#define PCA9555_C1 0x07 /* CONFIGURATION PORT 1 */
+#define PCA9555_INPUT 0
+#define PCA9555_OUTPUT 1
+
+/* EXPANDER PIN */
+#define SW3		0x00
+#define D11		0x01
+#define D10		0x02
+#define D9		0x03
 
 /* ************************************************************************** */
 /*                                   C_LIB                                    */
@@ -65,5 +86,14 @@ uint8_t			i2c_send_hex(const char* buffer, uint8_t size, uint8_t slave);
 uint8_t			i2c_lread(unsigned char* buffer, uint8_t size);
 uint8_t			i2c_ping_addr(uint8_t addr);
 void			i2c_ping(void);
+
+/* ************************************************************************** */
+/*                                  PCA9555                                   */
+/* ************************************************************************** */
+uint8_t			i2c_gpio_setio(const uint16_t val);
+uint16_t		i2c_gpio_get_register_pair(const uint8_t reg);
+void			i2c_gpio_set_register(const uint8_t reg, const uint8_t val);
+void			i2c_gpio_set_register_pair(const uint8_t reg, const uint16_t data);
+void			i2c_gpio_print_nbr(const uint8_t nbr);
 
 #endif

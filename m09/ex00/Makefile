@@ -17,9 +17,9 @@ INCLUDE_DIR := ./includes/
 
 SRC_DIR := src
 SRC_FILES := uart.c \
-			 i2c.c \
+			 pca9555.c \
 			 ft_lib.c \
-			 parser.c \
+			 i2c.c \
 			 main.c
 
 OBJ_DIR := .obj
