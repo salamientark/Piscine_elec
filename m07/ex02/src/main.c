@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 16:31:16 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/11 23:23:20 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/13 11:18:18 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,8 @@ void	init(void) {
 
 void	exec_cmd(const unsigned char *cmd) {
 	unsigned char	cmd_buffer[32] = {0};
-	unsigned char	prm_1_buffer[32] = {0};
-	unsigned char	prm_2_buffer[32] = {0};
+	unsigned char	prm_1_buffer[DATA_MAX_SIZE] = {0};
+	unsigned char	prm_2_buffer[DATA_MAX_SIZE] = {0};
 
 	if (parse_cmd(cmd, cmd_buffer, prm_1_buffer, prm_2_buffer) != 0)
 		return (uart_printstr("\033[31mInvalid cmd\033[0m\r\n"));
