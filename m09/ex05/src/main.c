@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 16:31:16 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/14 11:46:48 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/14 13:35:30 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,6 @@
  *    - Interrupts at page 66 - 78
  *    - External Interrupts at Pages 79 - 84
  */
-
-uint16_t g_nbr = 0;
 
 /* ************************************************************************** */
 /*                                    INIT                                    */
@@ -41,26 +39,24 @@ void	init(void) {
 				| (1 << TOF_E) | (1 << TOF_F) | (1 << TOF_G) | (1 << TOF_DPX))); /* | (1 << SW3) */
 
 	/* Init timer to 1Hz */
-	TCCR1B |= (1 << WGM12) | (1 << CS12) | (1 << CS10); // 1024 prescaler
+	TCCR1B |= (1 << WGM13) | (1 << WGM12) | (1 << CS12) | (1 << CS10); // 1024 prescaler, CTC mode
 	OCR1A = F_CPU / 1024; // 30hz
-	TIMSK1 |= (1 << OCIE1A); // Enable CTC interrupt
 }
 
 /* ************************************************************************** */
 /*                                    MAIN                                    */
 /* ************************************************************************** */
-ISR(TIMER1_COMPA_vect) {
-	g_nbr = (g_nbr + 1) % 10000;
-}
-
-
 int main() {
+	uint16_t nbr = 0;
 
 	init();
-	SREG |= (1 << SREG_I); // Enable global interrupt
 	while (1)
 	{
-		i2c_print_nbr(g_nbr);
+		while (!(TIFR1 & (1 << OCF1A)))
+			i2c_print_nbr(nbr);
+		TIFR1 |= (1 << OCF1A); /* Reset Compare match flag */
+		TCNT1 = 0; /* Reset timer */
+		nbr = (nbr + 1) % 10000;
 	}
 	
 	return (0);
