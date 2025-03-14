@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 23:15:26 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/14 09:22:51 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/14 10:39:18 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,7 +155,7 @@ void	i2c_gpio_set_register_pair(const uint8_t reg, const uint16_t data) {
  *
  * @param nbr -- The number value
  */
-void	i2c_gpio_print_nbr(const uint8_t nbr) {
+void	i2c_gpio_print_hex_nbr(const uint8_t nbr) {
 	i2c_gpio_set_register(PCA9555_O0, 0xFF & ~(nbr << 1));
 }
 
@@ -168,4 +168,62 @@ void	i2c_gpio_print_nbr(const uint8_t nbr) {
  */
 uint8_t	i2c_gpio_get_button_state(void) {
 	return (i2c_gpio_get_register(PCA9555_I0) & 0x01);
+}
+
+/**
+ * @brief Print one number on 7 segment display
+ *
+ * CA1 is the left most digit CQ4 the rightmose digit
+ *
+ * @param pos -- Position of the 7 segment display
+ * @param val -- Value to be printed
+ */
+void	i2c_gpio_print_one_nbr(const uint8_t pos, uint8_t val) {
+	uint16_t	i1_reg = 0;
+	uint16_t	i0_reg = i2c_gpio_get_register(PCA9555_I0);
+
+	val %= 10;
+	switch (val) {
+		case 0:
+			i1_reg |= (1 << TOF_A) | (1 << TOF_B) | (1 << TOF_C) | (1 << TOF_D)
+				| (1 << TOF_E) | (1 << TOF_F);
+			break ;
+		case 1:
+			i1_reg |= (1 << TOF_B) | (1 << TOF_C);
+			break ;
+		case 2:
+			i1_reg |= (1 << TOF_A) | (1 << TOF_B) | (1 << TOF_G) | (1 << TOF_E)
+				| (1 << TOF_D);
+			break ;
+		case 3:
+			i1_reg |= (1 << TOF_A) | (1 << TOF_B) | (1 << TOF_G) | (1 << TOF_C)
+				| (1 << TOF_D);
+			break ;
+		case 4:
+			i1_reg |= (1 << TOF_F) | (1 << TOF_G) | (1 << TOF_B) | (1 << TOF_C);
+			break ;
+		case 5:
+			i1_reg |= (1 << TOF_A) | (1 << TOF_F) | (1 << TOF_G) | (1 << TOF_C)
+			| (1 << TOF_D);
+			break ;
+		case 6:
+			i1_reg |= (1 << TOF_A) | (1 << TOF_F) | (1 << TOF_G) | (1 << TOF_C)
+			| (1 << TOF_D) | (1 << TOF_E);
+			break ;
+		case 7:
+			i1_reg |= (1 << TOF_A) | (1 << TOF_B) | (1 << TOF_C);
+			break ;
+		case 8:
+			i1_reg |= (1 << TOF_A) | (1 << TOF_B) | (1 << TOF_C) | (1 << TOF_D)
+			| (1 << TOF_E) | (1 << TOF_F) | (1 << TOF_G);
+			break ;
+		case 9:
+			i1_reg |= (1 << TOF_A) | (1 << TOF_B) | (1 << TOF_C) | (1 << TOF_D)
+			| (1 << TOF_F) | (1 << TOF_G);
+			break ;
+	}
+	/* Change 7 segment selectr */
+	i0_reg |= ((1 << CA1) | (1 << CA2) | (1 << CA3) | (1 << CA4));
+	i0_reg &= ~(1 << pos);
+	i2c_gpio_set_register_pair(PCA9555_O0, (i1_reg >> 8) | (i0_reg << 8));
 }
