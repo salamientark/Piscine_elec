@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 16:31:16 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/14 11:00:54 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/14 11:20:39 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,35 +43,14 @@ void	init(void) {
 /* ************************************************************************** */
 /*                                    MAIN                                    */
 /* ************************************************************************** */
-void	i2c_print_nbr(uint16_t nbr) {
-	i2c_gpio_print_one_nbr(CA4, nbr % 10);
-	_delay_us(MULTPILEX_DELAY_US);
-	if ((nbr /= 10) == 0)
-		return ;
-	i2c_gpio_print_one_nbr(CA3, nbr % 10);
-	_delay_us(MULTPILEX_DELAY_US);
-	if ((nbr /= 10) == 0)
-		return ;
-	i2c_gpio_print_one_nbr(CA2, nbr % 10);
-	_delay_us(MULTPILEX_DELAY_US);
-	if ((nbr /= 10) == 0)
-		return ;
-	i2c_gpio_print_one_nbr(CA1, nbr % 10);
-	_delay_us(MULTPILEX_DELAY_US);
-	if ((nbr /= 10) == 0)
-		return ;
-}
 
 int main() {
 	// uint8_t nbr = 0;
 
 	init();
-	while (1) {
+	while (1)
+	{
 		i2c_print_nbr(42);
-		// i2c_gpio_print_one_nbr(CA4, nbr);
-		// nbr = (nbr + 1) % 10;
-		// _delay_ms(100);
-
 	}
 	
 	return (0);

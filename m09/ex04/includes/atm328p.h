@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 12:38:17 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/14 11:00:33 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/14 11:03:30 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,8 @@
 # define TOF_F 0x0D
 # define TOF_G 0x0E
 # define TOF_DPX 0x0F
-# define MULTPILEX_DELAY_US 10000
+
+# define MULTPILEX_DELAY_US 20000 /* Multpiplex full cycle time */
 
 /* ************************************************************************** */
 /*                                   C_LIB                                    */
@@ -115,5 +116,6 @@ void			i2c_gpio_set_register(const uint8_t reg, const uint8_t val);
 void			i2c_gpio_set_register_pair(const uint8_t reg, const uint16_t data);
 void			i2c_gpio_print_hex_nbr(const uint8_t nbr);
 void			i2c_gpio_print_one_nbr(const uint8_t pos, uint8_t val);
+void			i2c_print_nbr(uint16_t nbr);
 
 #endif

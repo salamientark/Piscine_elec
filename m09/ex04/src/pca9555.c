@@ -6,11 +6,12 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/13 23:15:26 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/14 10:39:18 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/14 11:20:10 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/atm328p.h"
+#include <util/delay.h>
 
 /**
  * PCA9555 lib 
@@ -222,8 +223,36 @@ void	i2c_gpio_print_one_nbr(const uint8_t pos, uint8_t val) {
 			| (1 << TOF_F) | (1 << TOF_G);
 			break ;
 	}
+	/* Clear Display */
+	i2c_gpio_set_register(PCA9555_O1, 0x00);
+
 	/* Change 7 segment selectr */
 	i0_reg |= ((1 << CA1) | (1 << CA2) | (1 << CA3) | (1 << CA4));
 	i0_reg &= ~(1 << pos);
 	i2c_gpio_set_register_pair(PCA9555_O0, (i1_reg >> 8) | (i0_reg << 8));
+}
+
+void	i2c_gpio_clear_segment(void) {
+	
+}
+
+/**
+ * @brief Print number on 7 segment display NON LEADING 0
+ *
+ * @param nbr -- nbr to print
+ */
+void	i2c_print_nbr(uint16_t nbr) {
+	nbr %= 9999;
+	i2c_gpio_print_one_nbr(CA4, nbr % 10);
+	if ((nbr /= 10) == 0)
+		return ;
+	i2c_gpio_print_one_nbr(CA3, nbr % 10);
+	if ((nbr /= 10) == 0)
+		return ;
+	i2c_gpio_print_one_nbr(CA2, nbr % 10);
+	if ((nbr /= 10) == 0)
+		return ;
+	i2c_gpio_print_one_nbr(CA1, nbr % 10);
+	if ((nbr /= 10) == 0)
+		return ;
 }
