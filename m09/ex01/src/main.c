@@ -6,12 +6,13 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 16:31:16 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/14 00:31:02 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/14 09:19:13 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/atm328p.h"
 #include <stdint.h>
+#include <util/delay.h>
 
 
 /** *All the information that I needed for this can be found at:
@@ -37,25 +38,26 @@ void	init(void) {
 /* ************************************************************************** */
 /*                                    MAIN                                    */
 /* ************************************************************************** */
-
-// void	i2c_gpio_invert_pin_polarity(const uint16_t pin) {
-// 	uint16_t	pol = i2c_gpio_get_register_pair(PCA9555_P0);
-// 	pol ^= (1 << pin); /* Inverst polarity on pin */
-// 	i2c_gpio_set_register_pair(PCA9555_P0, pol);
-// }
-
 int main() {
 	init();
 
 	/* Set D9, D10, D11 as output */
 	i2c_gpio_setio(0xFFFF);
-	i2c_gpio_setio(0xFFFF & ~((1 << D9) | (1 << D10) | (1 << D11)));
+	i2c_gpio_setio(0xFFFF & ~((1 << D9) | (1 << D10) | (1 << D11))); /* | (1 << SW3) */
+
+	uint8_t	i2c_button_last_state = 0;
+	uint8_t	i2c_button_state = 0;
 
 	uint8_t nbr = 0;
 	while (1) {
-		i2c_gpio_print_nbr(nbr);
-		nbr = (nbr + 1) % 8;
-		_delay_ms(1000);
+		i2c_button_state = i2c_gpio_get_button_state();
+		if (i2c_button_state != i2c_button_last_state) {
+			if (i2c_button_state == 0)
+				nbr = (nbr + 1) % 8;
+			i2c_gpio_print_nbr(nbr);
+		}
+		i2c_button_last_state = i2c_button_state;
+		_delay_ms(20);
 	}
 	
 	return (0);

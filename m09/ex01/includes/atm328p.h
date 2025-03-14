@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 12:38:17 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/14 00:22:26 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/14 00:47:52 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 # define READ_SIZE		16
 
 /* PCA9555 */
-# define IO_EXPAND_ADDR 0x20
+# define PCA9555_ADDR 0x20
 
 /* PCA9555 ALIASES */
 #define PCA9555_I0 0x00 /* INPUT PORT 0 */
@@ -90,7 +90,10 @@ void			i2c_ping(void);
 /* ************************************************************************** */
 /*                                  PCA9555                                   */
 /* ************************************************************************** */
+uint8_t			i2c_gpio_get_button_state(void);
+void			i2c_gpio_reset_default_register(void);
 uint8_t			i2c_gpio_setio(const uint16_t val);
+uint8_t			i2c_gpio_get_register(const uint8_t reg);
 uint16_t		i2c_gpio_get_register_pair(const uint8_t reg);
 void			i2c_gpio_set_register(const uint8_t reg, const uint8_t val);
 void			i2c_gpio_set_register_pair(const uint8_t reg, const uint16_t data);
