@@ -6,7 +6,7 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/08 12:38:17 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/14 10:37:48 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/14 13:39:21 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,7 @@
 
 # include <avr/io.h>
 # include <util/delay.h>
-# include <avr/interrupt.h>
-# include <util/twi.h>
+# include "twi.h"
 
 # define READ_SIZE		16
 

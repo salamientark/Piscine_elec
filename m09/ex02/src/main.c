@@ -6,13 +6,11 @@
 /*   By: dbaladro <dbaladro@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/03 16:31:16 by dbaladro          #+#    #+#             */
-/*   Updated: 2025/03/14 10:38:58 by dbaladro         ###   ########.fr       */
+/*   Updated: 2025/03/14 13:39:09 by dbaladro         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/atm328p.h"
-#include <stdint.h>
-#include <util/delay.h>
 
 
 /** *All the information that I needed for this can be found at:
